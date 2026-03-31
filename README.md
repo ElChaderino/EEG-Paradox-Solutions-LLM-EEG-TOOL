@@ -255,4 +255,4 @@ Includes: `query_memory`, `web_search`, `fetch_url`, `get_system_stats`, `get_re
 
 Paradox Solutions LLM is **free software** under the **GNU General Public License v3.0 or later**. See the [`LICENSE`](LICENSE) file in the repository root for the full license text. SPDX: `GPL-3.0-or-later`.
 
-To (re)apply the standard per-file copyright + GPL notice to Python, TypeScript, Rust, and PowerShell sources after adding new files, run: `python scripts/apply_gpl_headers.py` from the repo root (use `python scripts/apply_gpl_headers.py --dedupe` if a merge ever duplicated a header block).
+
