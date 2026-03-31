@@ -1,6 +1,8 @@
-# Paradox Solutions LLM — Local AI Research Assistant
+# Paradox Solutions LLM â€” Local AI Research Assistant
 
 **GitHub:** [github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL](https://github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL)
+
+**Closed testing / access:** If you are in the private program, the organizer link is in the repo file [`Request Access`](Request%20Access).
 
 **Full documentation:** see the [`doc/`](doc/README.md) folder (user manuals, developer guides, technical reference, layer matrix).
 
@@ -10,7 +12,7 @@ Fully local stack: **Ollama** (LLM + embeddings), **ChromaDB** (scored memory), 
 
 **No cloud LLM APIs.** Optional: SearXNG, Skye (remote Ollama), Discord bridge.
 
-**Python package:** `hexnode` (import path). **Features:** weighted memory ranking (similarity + importance + **recency decay** + manual boost), **YAML neuro-symbolic routing hints** (`hexnode/symbolic/`, optional `data/rules.yaml`), **ReAct v2** agent steps (`parse_ok`, `tool_ok`, final-step nudge), **reflection intelligence**, **offline licensing** (RSA-signed, per-machine binding, feature flags), **file upload/management** (EEG, documents, general), **GPU optimizations** (flash attention, KV cache quantization, embedding quantization).
+**Python package:** `hexnode` (import path). **Features:** weighted memory ranking (similarity + importance + **recency decay** + manual boost), **YAML neuro-symbolic routing hints** (`hexnode/symbolic/`, optional `data/rules.yaml`), **ReAct v2** agent steps (`parse_ok`, `tool_ok`, final-step nudge), **reflection intelligence**, **file upload/management** (EEG, documents, general), **GPU optimizations** (flash attention, KV cache quantization, embedding quantization).
 
 ## Desktop Application (Recommended)
 
@@ -106,9 +108,9 @@ pip install -e ".[all]"
 copy .env.example .env
 ```
 
-Edit `.env` — set `CHAT_MODEL` / `EMBED_MODEL` to what you pulled. Optionally set `SEARXNG_URL`, `GOOGLE_CSE_API_KEY` + `GOOGLE_CSE_CX` (web search), `SKYE_URL`, Discord IDs.
+Edit `.env` â€” set `CHAT_MODEL` / `EMBED_MODEL` to what you pulled. Optionally set `SEARXNG_URL`, `GOOGLE_CSE_API_KEY` + `GOOGLE_CSE_CX` (web search), `SKYE_URL`, Discord IDs.
 
-## Launcher (Windows — API + UI)
+## Launcher (Windows â€” API + UI)
 
 Double-click **`launch.bat`**, **`Launch Paradox.bat`**, or **`Launch HEX.bat`** (same script), or run:
 
@@ -120,7 +122,7 @@ Optional: **`-Reinstall`** (re-run `pip install -e ".[all]"` and `npm install` i
 
 That opens two windows (FastAPI on **8765**, Next.js on **3000**) and your browser to the UI.
 
-If a `.bat` window looks “stuck” at the PowerShell banner, ensure you are using the repo’s launchers (they use `cd "%~dp0."` so paths with spaces like `EEG Paradox Solutions LLM` work under `cmd`).
+If a `.bat` window looks â€œstuckâ€ at the PowerShell banner, ensure you are using the repoâ€™s launchers (they use `cd "%~dp0."` so paths with spaces like `EEG Paradox Solutions LLM` work under `cmd`).
 
 **API only:** **`launch-api-only.bat`** runs `run_server.py` in one console (no Ollama check, no Next.js).
 
@@ -148,7 +150,7 @@ Open `http://localhost:3000`.
 | Method | Endpoint | Purpose |
 |--------|----------|---------|
 | GET | `/health` | Status, Ollama connectivity, optimization info |
-| POST | `/agent` | Main agent — send message, receive answer |
+| POST | `/agent` | Main agent â€” send message, receive answer |
 | POST | `/memory/query` | Semantic search across memory collections |
 | GET | `/system/stats` | CPU, RAM, disk, GPU metrics |
 | GET | `/focus` | Current reflection focus document |
@@ -162,11 +164,11 @@ Open `http://localhost:3000`.
 
 Under `data/` (created at runtime):
 
-- `chroma/` — vector store
-- `vault/reflections/` — reflection markdown
-- `vault/current_focus.md` — injected into the agent system prompt
-- `ingest_queue/` — drop `.pdf`, `.md`, `.txt`, `.csv`, `.json`, `.yaml`, `.docx`; the watcher ingests periodically
-- `eeg_workspace/` — EEG files (`.edf`, `.bdf`, `.fif`, `.set`, `.vhdr`)
+- `chroma/` â€” vector store
+- `vault/reflections/` â€” reflection markdown
+- `vault/current_focus.md` â€” injected into the agent system prompt
+- `ingest_queue/` â€” drop `.pdf`, `.md`, `.txt`, `.csv`, `.json`, `.yaml`, `.docx`; the watcher ingests periodically
+- `eeg_workspace/` â€” EEG files (`.edf`, `.bdf`, `.fif`, `.set`, `.vhdr`)
 
 ## Licensing
 
@@ -176,9 +178,9 @@ This repository build does **not** ship product licensing: no `/license/*` API r
 
 The web UI includes a file management panel for uploading:
 
-- **EEG files** (`.edf`, `.bdf`, `.set`, `.fif`, `.vhdr`, `.cnt`) — routed to `eeg_workspace/`
-- **Documents** (`.pdf`, `.txt`, `.md`, `.csv`, `.json`, `.yaml`, `.docx`) — routed to `ingest_queue/`, auto-ingested into memory
-- **General files** — stored in `vault/uploads/`
+- **EEG files** (`.edf`, `.bdf`, `.set`, `.fif`, `.vhdr`, `.cnt`) â€” routed to `eeg_workspace/`
+- **Documents** (`.pdf`, `.txt`, `.md`, `.csv`, `.json`, `.yaml`, `.docx`) â€” routed to `ingest_queue/`, auto-ingested into memory
+- **General files** â€” stored in `vault/uploads/`
 
 Drag-and-drop or click to upload. Files are listed with category filtering and delete support.
 
@@ -194,7 +196,7 @@ Schedule `python scripts\reflect.py` with Windows Task Scheduler (e.g. 03:30 dai
 
 ## EEG Research Mode
 
-Paradox includes a full EEG research stack for QEEG, ERP, spectral, connectivity, microstates, and **interactive clinical / NetOps-style dashboards** (traceroute explorer, multi-tab clinician summary, latency SLA, packet-loss views, pattern–condition evidence, vigilance, TBI/PD-oriented reports, and related HTML panels when the NetOps bundle runs).
+Paradox includes a full EEG research stack for QEEG, ERP, spectral, connectivity, microstates, and **interactive clinical / NetOps-style dashboards** (traceroute explorer, multi-tab clinician summary, latency SLA, packet-loss views, patternâ€“condition evidence, vigilance, TBI/PD-oriented reports, and related HTML panels when the NetOps bundle runs).
 
 **Development / source runs:** install EEG dependencies so the same interpreter can run pipelines and tools:
 
@@ -220,9 +222,9 @@ This adds MNE-Python, pyedflib, NumPy, SciPy, matplotlib, pandas, statsmodels, a
 
 **Workflows:**
 
-1. **Web UI — EEG Data panel** — Upload a recording; the API runs a **background job** (24-step-style pipeline generation + clinical scripts + `run_visualizations.py`). Open HTML/PNG results in the browser or from `data/eeg_workspace/output/<job_id>/`. See **`doc/user/09-eeg-research.md`**.
-2. **Chat / agent** — Ask Paradox to analyze files: `run_eeg_pipeline` runs the full automated script; `run_python_analysis` runs custom MNE code with retries. Outputs go to the EEG workspace output tree.
-3. **Manual drop-in** — Place files under `data/eeg_workspace/` and reference them from scripts or the agent.
+1. **Web UI â€” EEG Data panel** â€” Upload a recording; the API runs a **background job** (24-step-style pipeline generation + clinical scripts + `run_visualizations.py`). Open HTML/PNG results in the browser or from `data/eeg_workspace/output/<job_id>/`. See **`doc/user/09-eeg-research.md`**.
+2. **Chat / agent** â€” Ask Paradox to analyze files: `run_eeg_pipeline` runs the full automated script; `run_python_analysis` runs custom MNE code with retries. Outputs go to the EEG workspace output tree.
+3. **Manual drop-in** â€” Place files under `data/eeg_workspace/` and reference them from scripts or the agent.
 
 **Operator docs:** `doc/user/09-eeg-research.md` (jobs, REST routes, artifact types). **Technical deep dive:** open `doc/technical-reference.html` in a browser (24-step pipeline math + interactive outputs section).
 
