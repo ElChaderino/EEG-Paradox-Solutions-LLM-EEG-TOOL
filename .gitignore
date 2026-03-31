@@ -9,7 +9,14 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .mypy_cache/
-data/
+# Runtime-only under data/ (Chroma, uploads, workspace); ship templates + reference docs
+data/*
+!data/eeg_scripts/
+!data/eeg_scripts/**
+data/eeg_scripts/__pycache__/
+!data/eeg_reference/
+!data/eeg_reference/**
+installers/.DS_Store
 node_modules/
 web/.next/
 *.egg-info/

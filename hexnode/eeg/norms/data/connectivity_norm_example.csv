@@ -1,0 +1,4 @@
+method,fmin,fmax,ch_a,ch_b,mean,sd
+coh,4.0,30.0,Fp1,F3,0.35,0.10
+coh,4.0,30.0,Fp1,F7,0.30,0.12
+coh,4.0,30.0,C3,C4,0.42,0.11

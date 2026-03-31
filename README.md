@@ -1,4 +1,4 @@
-# Paradox Solutions LLM â€” Local AI Research Assistant
+# Paradox Solutions LLM — Local AI Research Assistant
 
 **GitHub:** [github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL](https://github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL)
 
@@ -42,6 +42,8 @@ $env:PARADOX_REPO_ROOT = (Get-Location).Path; Set-Location src-tauri; cargo taur
 ```
 
 Installers land under `src-tauri/target/release/bundle/nsis/` and `bundle/msi/` (filenames include the semver from `VERSION` / `tauri.conf.json`, e.g. `Paradox Solutions LLM_0.3.2_x64-setup.exe`).
+
+**Shipping installers in git:** copy the built `.exe` (or `.msi`) into the repo’s [`installers/`](installers/) folder and commit. See [`installers/README.md`](installers/README.md) for size limits and Git LFS. EEG script templates and reference markdown under `data/eeg_scripts/` and `data/eeg_reference/` are versioned with the source tree.
 
 **Release notes:** see root `CHANGELOG.md`. **Bump version:** edit `VERSION`, then run `scripts\bump_version.ps1`.
 
