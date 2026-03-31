@@ -1,8 +1,9 @@
 # Paradox Solutions LLM — Local AI Research Assistant
 
-**GitHub:** [github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL](https://github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL)
+[![ALT_TEXT](https://img.youtube.com/vi/Lpp8FkDttkw/0.jpg)](https://www.youtube.com/watch?v=Lpp8FkDttkw)
 
-**Closed testing / access:** If you are in the private program, the organizer link is in the repo file [`Request Access`](Request%20Access).
+
+**GitHub:** [github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL](https://github.com/ElChaderino/EEG-Paradox-Solutions-LLM-EEG-TOOL)
 
 **Full documentation:** see the [`doc/`](doc/README.md) folder (user manuals, developer guides, technical reference, layer matrix).
 
