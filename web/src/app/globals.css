@@ -1,0 +1,97 @@
+@import "tailwindcss";
+
+:root {
+  /* UI density: multiplied with 16px on html (see html rule below). Persisted in localStorage. */
+  --paradox-font-scale: 1;
+  --background: #000000;
+  --foreground: #ededed;
+  --bg-primary: #000000;
+  --bg-secondary: rgb(5, 5, 8);
+  --bg-tertiary: rgb(12, 12, 16);
+  --bg-panel: rgba(0, 0, 0, 0.85);
+  --border-primary: rgb(10, 12, 15);
+  --border-secondary: rgb(20, 24, 28);
+  --text-primary: rgb(243, 244, 246);
+  --text-secondary: rgb(34, 211, 238);
+  --text-muted: rgb(8, 145, 178);
+  --text-heading: rgb(236, 254, 255);
+  --hover-accent: rgba(8, 51, 68, 0.2);
+  --scrollbar-thumb: rgba(8, 145, 178, 0.3);
+  --scrollbar-thumb-hover: rgba(8, 145, 178, 0.5);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+html {
+  font-size: calc(16px * var(--paradox-font-scale, 1));
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+.styled-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+.styled-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 10px;
+}
+.styled-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+.styled-scrollbar {
+  scrollbar-width: thin;
+}
+
+/* Paradox Markdown rendering inside chat bubbles */
+.paradox-markdown hr {
+  border-color: rgba(8, 145, 178, 0.2);
+  margin: 0.5rem 0;
+}
+.paradox-markdown li > p {
+  margin-bottom: 0;
+}
+
+/* Matrix HUD remap — links */
+[data-hud="matrix"] .paradox-markdown a {
+  color: #4ade80 !important;
+  text-decoration-color: rgba(22, 163, 74, 0.5) !important;
+}
+[data-hud="matrix"] .paradox-markdown a:hover {
+  color: #86efac !important;
+}
+
+/* Matrix HUD remap (Paradox Solutions HUD theme) */
+[data-hud="matrix"] .hud-zone {
+  --text-secondary: #4ade80;
+  --text-muted: #16a34a;
+  --text-heading: #bbf7d0;
+  --scrollbar-thumb: rgba(22, 163, 74, 0.3);
+  --scrollbar-thumb-hover: rgba(22, 163, 74, 0.5);
+}
+[data-hud="matrix"] .hud-zone .text-cyan-400 {
+  color: #4ade80 !important;
+}
+[data-hud="matrix"] .hud-zone .text-cyan-600 {
+  color: #16a34a !important;
+}
+[data-hud="matrix"] .hud-zone .border-cyan-900\/40,
+[data-hud="matrix"] .hud-zone .border-cyan-900\/50 {
+  border-color: rgba(20, 83, 45, 0.45) !important;
+}
+[data-hud="matrix"] .hud-zone .bg-cyan-950\/20 {
+  background-color: rgba(5, 46, 22, 0.25) !important;
+}
+[data-hud="matrix"] .hud-zone .bg-cyan-900\/50 {
+  background-color: rgba(20, 83, 45, 0.45) !important;
+}

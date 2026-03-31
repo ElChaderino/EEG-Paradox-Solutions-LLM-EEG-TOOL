@@ -1,0 +1,7 @@
+# Copy to data/rules.yaml to extend symbolic hints (optional).
+# Merged after packaged defaults; same schema:
+# hints:
+#   - pattern: "(?i)your_regex"
+#     text: "Hint injected into the agent system prompt when the user message matches."
+version: 1
+hints: []

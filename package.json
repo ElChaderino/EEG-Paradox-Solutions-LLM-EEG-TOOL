@@ -1,0 +1,16 @@
+{
+  "name": "eeg-paradox-solutions-llm",
+  "private": true,
+  "license": "GPL-3.0-or-later",
+  "description": "Repo root: Tailwind/PostCSS resolves bare package names from this folder when the workspace is opened here (not only from web/).",
+  "scripts": {
+    "dev": "npm run dev --prefix web",
+    "build": "npm run build --prefix web",
+    "start": "npm run start --prefix web",
+    "lint": "npm run lint --prefix web"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "tailwindcss": "^4"
+  }
+}

@@ -1,0 +1,34 @@
+[package]
+name = "paradox-solutions-llm"
+version = "0.3.2"
+description = "Paradox Solutions LLM — local AI research assistant"
+edition = "2021"
+license = "GPL-3.0-or-later"
+
+[lib]
+name = "paradox_solutions_llm_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
+path = "src/lib.rs"
+
+[[bin]]
+name = "paradox-solutions-llm"
+path = "src/main.rs"
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-shell = "2"
+tauri-plugin-http = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["process", "time", "fs", "io-util"] }
+reqwest = { version = "0.12", features = ["json"] }
+dirs = "6"
+log = "0.4"
+env_logger = "0.11"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[features]
+default = ["custom-protocol"]
+custom-protocol = ["tauri/custom-protocol"]

@@ -1,0 +1,149 @@
+# Neuro-symbolic hints: regex patterns (case-sensitive RE2/Python re) -> deterministic guidance.
+# Merged with data/rules.yaml if present. Edit data copy to extend without forking defaults.
+version: 1
+hints:
+  # ── General system ──
+  - pattern: "(?i)(gpu|nvidia|vram|cuda|graphics)"
+    text: "For GPU facts use get_system_stats; for raw nvidia-smi CSV use run_shell_command with preset nvidia_smi."
+  - pattern: "(?i)(memory|recall|what did i say|remember|past conversation)"
+    text: "Use query_memory with a concrete query; omit collection to search all stores."
+  - pattern: "(?i)(cpu|ram|disk|system stats|how much free)"
+    text: "Use get_system_stats and optionally get_realtime_stats for process-level detail."
+  - pattern: "(?i)(search the web|look up online|google|look up|find out)"
+    text: "Use web_search ONCE with a short natural query (3-6 words). It auto-fetches page content. Read KEY FACTS in the result and answer immediately."
+  - pattern: "(?i)(when is|where is|next .+ (event|conference|summit|meeting)|schedule for|date of)"
+    text: >
+      Use web_search ONCE with a natural query. Read KEY FACTS and page content from results.
+      Extract dates, locations, and URLs. Answer immediately — do NOT search again.
+      If only a past event is found, state that and note no future date is announced yet.
+  - pattern: "(?i)(tell me about|history of|what is|explain how)"
+    text: "Use web_search ONCE for current facts. Read the KEY FACTS and page content, then answer in Markdown sections (intro, ## sections) with clear prose."
+  - pattern: "(?i)(research|papers? (on|about)|studies (on|about)|literature|pubmed|scholar|find (papers?|studies|research)|review of)"
+    text: >
+      Use deep_research for thorough multi-source research. Web results use Google Programmable Search
+      plus DuckDuckGo when API keys are set (otherwise DuckDuckGo), together with PubMed and Google Scholar;
+      it fetches pages and extracts content. Results are cached 48h. Read extracted content and synthesize.
+  - pattern: "(?i)(fetch|read this url|scrape)"
+    text: "Use fetch_url with a single http(s) URL; respect site policies."
+  - pattern: "(?i)(reflect|introspect|overnight|patterns in memory)"
+    text: "Use run_reflection for a structured pass; it updates vault and current_focus."
+
+  # ── EEG software platforms ──
+  - pattern: "(?i)(MNE|MNE.?Python|mne\\.io)"
+    text: >
+      MNE-Python is the primary local analysis library (official docs: https://mne.tools/stable/index.html).
+      Use list_eeg_scripts for tiered templates (basic→expert), then run_python_analysis. MNE reads EDF, BDF,
+      FIF, BrainVision (.vhdr), EGI, CNT, XDF, GDF, and more. For install status use run_shell_command preset mne_sys_info.
+  - pattern: "(?i)(EEGLAB|\\.set\\b|fieldtrip)"
+    text: >
+      EEGLAB is MATLAB-based. Its .set/.fdt files can be loaded in MNE via mne.io.read_epochs_eeglab()
+      or mne.io.read_raw_eeglab(). Use run_python_analysis with MNE to work with .set files locally.
+  - pattern: "(?i)(NeuroGuide|neuro.?guide|normative database|Thatcher)"
+    text: >
+      NeuroGuide by Robert Thatcher uses proprietary normative databases and exports EDF/text reports.
+      For QEEG z-score analysis, export EDF from NeuroGuide, load in MNE, compute PSDs, and compare
+      to published norms. Use web_search for latest NeuroGuide protocols.
+  - pattern: "(?i)(Cygnet|cygnet|Planet Cygnet)"
+    text: >
+      Cygnet is a neurofeedback delivery platform. It imports/exports EDF and supports Z-score training.
+      Use run_python_analysis with pyedflib or MNE to read Cygnet EDF exports for offline analysis.
+  - pattern: "(?i)(BrainMaster|brain.?master|Discovery|Atlantis)"
+    text: >
+      BrainMaster systems (Discovery, Atlantis) export EDF, BDF, and ASCII. Load exports via
+      MNE (mne.io.read_raw_edf) or pyedflib. For live BrainMaster data, export EDF first.
+  - pattern: "(?i)(BioExplorer|bio.?explorer)"
+    text: >
+      BioExplorer exports EDF and CSV. Use run_python_analysis with pyedflib or MNE to load
+      BioExplorer recordings. CSV exports can be loaded with pandas.
+  - pattern: "(?i)(BioEra|bio.?era)"
+    text: >
+      BioEra is a visual biofeedback designer; it exports EDF and raw binary.
+      Load EDF exports via MNE or pyedflib in run_python_analysis.
+  - pattern: "(?i)(OpenBCI|open.?bci|Cyton|Ganglion|BrainFlow)"
+    text: >
+      OpenBCI boards (Cyton, Ganglion) stream via BrainFlow or OpenBCI GUI which exports CSV/BDF.
+      Load CSV with pandas or BDF with MNE. For real-time, BrainFlow's Python SDK streams to NumPy arrays.
+
+  # ── EEG analysis methods ──
+  - pattern: "(?i)(frequenc|spectral|PSD|power spectral|band.?power|delta|theta|alpha|beta|gamma|SMR|hi.?beta)"
+    text: >
+      Standard EEG bands: delta 0.5-4 Hz, theta 4-8 Hz, alpha 8-13 Hz, SMR 12-15 Hz,
+      beta 13-30 Hz, hi-beta 20-30 Hz, gamma 30-100 Hz. Use run_python_analysis with
+      MNE's compute_psd() or scipy.signal.welch() for spectral analysis. Save PSD plots
+      to output/.
+  - pattern: "(?i)(QEEG|quantitative EEG|brain.?map|z.?score|normative|topo.?map)"
+    text: >
+      QEEG involves computing absolute/relative band power per channel and comparing to normative
+      databases. Use run_python_analysis with MNE for PSDs, then plot topomaps with
+      mne.viz.plot_topomap(). For z-score computation, compare to published age-matched norms.
+      Use web_search for QEEG protocols and normative references.
+  - pattern: "(?i)(ERP|P300|N400|N100|N170|MMN|P600|event.?related|evoked)"
+    text: >
+      ERP analysis: epoch around events, baseline-correct, average. Use run_python_analysis
+      with MNE: mne.Epochs() -> epochs.average() -> evoked.plot(). Key components:
+      P300 (attention/oddball), N400 (semantic), N170 (face), MMN (auditory deviance).
+  - pattern: "(?i)(artifact|ICA|EOG|EMG|reject|clean|autoreject)"
+    text: >
+      Preprocessing pipeline: 1) notch filter (50/60 Hz), 2) bandpass (0.1-100 Hz),
+      3) bad channel interpolation, 4) re-reference (average or linked mastoid),
+      5) ICA for eye/muscle artifact removal. Use run_python_analysis with MNE's
+      ICA class: ica.fit(raw) -> ica.find_bads_eog() -> ica.apply().
+  - pattern: "(?i)(coherence|phase.?lag|connectivity|PLI|PLV|Granger|DTF|PDC)"
+    text: >
+      Connectivity analysis measures statistical dependencies between channels.
+      Use run_python_analysis with mne_connectivity (spectral_connectivity_epochs)
+      for coherence, PLI, PLV. For source-level, apply inverse first then compute connectivity.
+  - pattern: "(?i)(sLORETA|LORETA|eLORETA|source.?local|inverse|beamform|dipole)"
+    text: >
+      Source localization estimates intracranial generators from scalp EEG.
+      sLORETA/eLORETA are distributed inverse solutions. Use run_python_analysis with
+      MNE: create forward model (mne.make_forward_solution), compute inverse operator,
+      apply with mne.minimum_norm.apply_inverse(). Requires BEM or sphere head model.
+
+  # ── EEG file formats ──
+  - pattern: "(?i)(\\.edf|\\.bdf|EDF\\+|BDF\\+|European Data Format)"
+    text: >
+      EDF/BDF are standard EEG interchange formats. EDF uses 16-bit, BDF uses 24-bit resolution.
+      Load with mne.io.read_raw_edf() / read_raw_bdf() or pyedflib. Most EEG software
+      (NeuroGuide, BrainMaster, BioExplorer, Cygnet) exports EDF. Use list_eeg_files preset
+      to find EEG files in the workspace.
+  - pattern: "(?i)(\\.fif|FIF format|Elekta|MEGIN|Neuromag)"
+    text: "FIF is MNE/Elekta native format. Load with mne.io.read_raw_fif(). Supports raw, epochs, evoked, forward, inverse."
+  - pattern: "(?i)(\\.vhdr|BrainVision|Brain Products|ActiCHamp)"
+    text: "BrainVision (.vhdr/.vmrk/.eeg triplet) is from Brain Products. Load with mne.io.read_raw_brainvision()."
+
+  # ── EEG hardware / setup ──
+  - pattern: "(?i)(montage|10.?20|10.?10|electrode|placement|channel.?loc|cap)"
+    text: >
+      Standard montages: 10-20 (21 channels), 10-10 (64+), 10-5 (300+). Use
+      mne.channels.make_standard_montage('standard_1020') in run_python_analysis.
+      For custom montages, load channel locations from a file.
+  - pattern: "(?i)(neurofeedback|NFB|protocol|training|inhibit|reward|threshold)"
+    text: >
+      Neurofeedback protocols: SMR (12-15 Hz reward at Cz), beta (15-18 Hz), alpha-theta
+      (deep states), z-score training (multi-channel normalization). Use web_search for
+      evidence-based protocols and query_memory for session history.
+  - pattern: "(?i)(filter|bandpass|notch|high.?pass|low.?pass|FIR|IIR|re.?referenc)"
+    text: >
+      Preprocessing filters: notch 50/60 Hz (mne raw.notch_filter()), bandpass 0.1-100 Hz
+      (raw.filter()), re-reference (raw.set_eeg_reference()). Use run_python_analysis
+      with MNE. FIR recommended for most EEG; IIR for real-time.
+
+  # ── EEG pipeline ──
+  - pattern: "(?i)(pipeline|full analysis|preprocess.*analy|end.?to.?end|automated.*EEG|run.*pipeline)"
+    text: >
+      Use run_eeg_pipeline for a complete 24-step automated pipeline: load -> quality check ->
+      filter -> notch -> bad channels -> interpolate -> re-reference -> ICA -> ICLabel ->
+      clean -> events -> epochs -> ERP -> ERPimage -> time-frequency -> spectral bands ->
+      connectivity -> network metrics -> quality report -> export. Params: filename (required),
+      hp_freq, lp_freq, notch_freq, ica_method, icalabel_threshold, connectivity_method.
+  - pattern: "(?i)(clean.*data|preprocess.*recording|artifact.*remov.*pipeline)"
+    text: >
+      For full preprocessing use run_eeg_pipeline which handles filtering, bad channel detection,
+      interpolation, re-referencing, ICA with ICLabel automatic classification, and artifact removal.
+      For custom single-step work use run_python_analysis with MNE scripts.
+  - pattern: "(?i)(report|quality.*metric|diagnostic|summary.*analysis)"
+    text: >
+      run_eeg_pipeline automatically generates a quality report with step status, metrics
+      (bad channels, ICA components removed, epochs rejected, connectivity, band power),
+      and saves output files (cleaned .fif, ICA weights, epochs, figures, metrics JSON).

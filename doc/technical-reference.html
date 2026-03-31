@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-Clacks-Overhead" content="GNU Terry Pratchett">
+<!-- A man is not dead while his name is still spoken. -->
+<title>Paradox Solutions LLM — Technical Reference</title>
+<style>
+  :root {
+    --bg: #0a0e14; --bg2: #0d1117; --bg3: #161b22;
+    --cyan: #00e5ff; --cyan-dim: #00acc1; --cyan-dark: #004d5a;
+    --green: #39ff14; --green-dim: #2e7d32;
+    --text: #c9d1d9; --text-dim: #8b949e; --text-bright: #f0f6fc;
+    --orange: #ff9800; --red: #ff5252; --purple: #bb86fc;
+    --border: #21262d; --code-bg: #0d1117;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.7; padding: 0;
+  }
+
+  /* ── NAV ── */
+  nav {
+    position: fixed; top: 0; left: 0; width: 280px; height: 100vh;
+    background: var(--bg2); border-right: 1px solid var(--border);
+    overflow-y: auto; padding: 1.5rem 1rem; z-index: 100;
+    scrollbar-width: thin; scrollbar-color: var(--cyan-dark) transparent;
+  }
+  nav h2 { color: var(--cyan); font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; margin-bottom: .5rem; }
+  nav a {
+    display: block; color: var(--text-dim); text-decoration: none;
+    padding: .25rem .5rem; font-size: .85rem; border-radius: 4px; margin-bottom: 1px;
+    transition: all .15s;
+  }
+  nav a:hover, nav a.active { color: var(--cyan); background: rgba(0,229,255,.06); }
+  nav .sub { padding-left: 1.2rem; font-size: .8rem; }
+  nav .sep { border-top: 1px solid var(--border); margin: .6rem 0; }
+
+  /* ── MAIN ── */
+  main {
+    margin-left: 280px; max-width: 960px; padding: 2rem 3rem 6rem 3rem;
+  }
+
+  /* ── HEADINGS ── */
+  h1 {
+    font-size: 2.2rem; color: var(--cyan); letter-spacing: .08em;
+    border-bottom: 2px solid var(--cyan-dark); padding-bottom: .5rem;
+    margin-bottom: .5rem;
+  }
+  h1 small { display: block; font-size: .9rem; color: var(--text-dim); letter-spacing: .02em; font-weight: 400; margin-top: .3rem; }
+  h2 {
+    font-size: 1.5rem; color: var(--cyan); margin-top: 3rem; margin-bottom: .8rem;
+    padding-bottom: .3rem; border-bottom: 1px solid var(--border);
+    scroll-margin-top: 1rem;
+  }
+  h3 {
+    font-size: 1.15rem; color: var(--green); margin-top: 1.5rem; margin-bottom: .5rem;
+    scroll-margin-top: 1rem;
+  }
+  h4 { font-size: 1rem; color: var(--orange); margin-top: 1rem; margin-bottom: .4rem; }
+
+  /* ── PROSE ── */
+  p { margin-bottom: .9rem; }
+  strong { color: var(--text-bright); }
+  em { color: var(--cyan-dim); font-style: italic; }
+  a { color: var(--cyan); text-decoration: underline; text-decoration-color: var(--cyan-dark); }
+  a:hover { text-decoration-color: var(--cyan); }
+  ul, ol { margin: .5rem 0 1rem 1.5rem; }
+  li { margin-bottom: .3rem; }
+  blockquote {
+    border-left: 3px solid var(--cyan-dark); padding: .5rem 1rem;
+    margin: 1rem 0; color: var(--text-dim); font-style: italic; background: var(--bg2);
+    border-radius: 0 6px 6px 0;
+  }
+
+  /* ── CODE ── */
+  code {
+    font-family: 'Cascadia Code', 'Fira Code', 'JetBrains Mono', monospace;
+    background: var(--code-bg); color: var(--green); padding: .15em .4em;
+    border-radius: 3px; font-size: .88em; border: 1px solid var(--border);
+  }
+  pre {
+    background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 6px; padding: 1rem 1.2rem; overflow-x: auto;
+    margin: .8rem 0 1.2rem 0; font-size: .85rem; line-height: 1.6;
+  }
+  pre code { background: none; border: none; padding: 0; color: var(--text); }
+  .kw { color: var(--purple); } .fn { color: var(--cyan); } .cm { color: var(--text-dim); }
+  .st { color: var(--orange); } .num { color: var(--green); }
+
+  /* ── MATH ── */
+  .math {
+    display: block; background: var(--bg3); border: 1px solid var(--border);
+    border-radius: 6px; padding: .8rem 1.2rem; margin: .8rem 0 1rem 0;
+    font-family: 'Cambria Math', 'STIX Two Math', Georgia, serif;
+    font-size: 1.05rem; color: var(--text-bright); text-align: center;
+    letter-spacing: .03em; overflow-x: auto;
+  }
+  .math-inline {
+    font-family: 'Cambria Math', 'STIX Two Math', Georgia, serif;
+    color: var(--text-bright); font-size: .95em;
+  }
+
+  /* ── TABLES ── */
+  table {
+    width: 100%; border-collapse: collapse; margin: .8rem 0 1.2rem 0;
+    font-size: .88rem;
+  }
+  th {
+    background: var(--bg3); color: var(--cyan); text-align: left;
+    padding: .5rem .7rem; border: 1px solid var(--border); font-weight: 600;
+    letter-spacing: .03em;
+  }
+  td { padding: .4rem .7rem; border: 1px solid var(--border); }
+  tr:hover td { background: rgba(0,229,255,.03); }
+
+  /* ── COLLAPSIBLE SECTIONS ── */
+  details {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
+    margin: .8rem 0; overflow: hidden;
+  }
+  details[open] { border-color: var(--cyan-dark); }
+  summary {
+    cursor: pointer; padding: .7rem 1rem; font-weight: 600;
+    color: var(--text-bright); list-style: none; display: flex;
+    align-items: center; gap: .5rem; user-select: none;
+    transition: background .15s;
+  }
+  summary:hover { background: rgba(0,229,255,.05); }
+  summary::before {
+    content: '\25B6'; font-size: .7em; color: var(--cyan);
+    transition: transform .2s; display: inline-block;
+  }
+  details[open] > summary::before { transform: rotate(90deg); }
+  summary::-webkit-details-marker { display: none; }
+  .details-body { padding: .5rem 1rem 1rem 1rem; }
+
+  /* ── DIAGRAM BOXES ── */
+  .diagram {
+    display: flex; flex-wrap: wrap; gap: .5rem; margin: 1rem 0;
+    justify-content: center; align-items: center;
+  }
+  .diagram .box {
+    background: var(--bg3); border: 1px solid var(--cyan-dark);
+    border-radius: 6px; padding: .5rem .8rem; text-align: center;
+    font-size: .82rem; color: var(--cyan); min-width: 100px;
+  }
+  .diagram .arrow { color: var(--text-dim); font-size: 1.2rem; }
+  .diagram .box.active { border-color: var(--green); color: var(--green); }
+
+  /* ── BADGES ── */
+  .badge {
+    display: inline-block; padding: .15em .5em; border-radius: 3px;
+    font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+  }
+  .badge-cyan { background: rgba(0,229,255,.15); color: var(--cyan); }
+  .badge-green { background: rgba(57,255,20,.12); color: var(--green); }
+  .badge-orange { background: rgba(255,152,0,.15); color: var(--orange); }
+
+  /* ── LAYER CARDS ── */
+  .layer-card {
+    background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
+    padding: 1.2rem 1.4rem; margin: 1rem 0;
+  }
+  .layer-card h4 { margin-top: 0; }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 900px) {
+    nav { position: static; width: 100%; height: auto; max-height: 50vh; border-right: none; border-bottom: 1px solid var(--border); }
+    main { margin-left: 0; padding: 1.5rem 1.2rem 4rem 1.2rem; }
+  }
+
+  /* ── SCROLLBAR ── */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--cyan-dark); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <h2>Paradox // Reference</h2>
+  <a href="#intro">Introduction</a>
+  <a href="#architecture">Architecture Overview</a>
+  <a href="#data-flow">End-to-End Data Flow</a>
+  <div class="sep"></div>
+  <a href="#layer-1">Layer 1: Configuration</a>
+  <a href="#layer-2">Layer 2: Ollama Client</a>
+  <a href="#layer-3">Layer 3: Vector Memory</a>
+  <a href="#layer-4">Layer 4: Symbolic Router</a>
+  <a href="#layer-5">Layer 5: Agent Loop</a>
+  <a href="#layer-6">Layer 6: System Prompts</a>
+  <a href="#layer-7">Layer 7: Answer Formatting</a>
+  <div class="sep"></div>
+  <a href="#tools">Tool Catalog</a>
+  <a class="sub" href="#tool-websearch">Web Search</a>
+  <a class="sub" href="#tool-deepresearch">Deep Research</a>
+  <a class="sub" href="#tool-fetch">Fetch URL</a>
+  <a class="sub" href="#tool-python">Python Analysis</a>
+  <a class="sub" href="#tool-pipeline">EEG Pipeline</a>
+  <a class="sub" href="#tool-memory">Memory Tools</a>
+  <a class="sub" href="#tool-system">System Tools</a>
+  <div class="sep"></div>
+  <a href="#eeg">EEG Analysis Deep Dive</a>
+  <a class="sub" href="#eeg-pipeline">24-Step Pipeline</a>
+  <a class="sub" href="#eeg-math">Signal Processing Math</a>
+  <a class="sub" href="#eeg-formats">File Formats</a>
+  <a class="sub" href="#eeg-software">Software Ecosystem</a>
+  <a class="sub" href="#eeg-interactive">Interactive Outputs &amp; Jobs</a>
+  <a class="sub" href="#eeg-worker">Bundled EEG Worker</a>
+  <a class="sub" href="#eeg-clinical-layer">Clinical &amp; NetOps Layers</a>
+  <a class="sub" href="#eeg-phenotypes">Phenotype-Informed Analysis</a>
+  <a class="sub" href="#eeg-advanced-viz">Advanced Visualizations</a>
+  <div class="sep"></div>
+  <a href="#reflection">Reflection Engine</a>
+  <a href="#optimization">GPU &amp; Memory Optimization</a>
+  <a class="sub" href="#opt-flash">Flash Attention</a>
+  <a class="sub" href="#opt-kv">KV Cache Quantization</a>
+  <a class="sub" href="#opt-embed">Embedding Quantization</a>
+  <a class="sub" href="#opt-turboquant">TurboQuant Theory</a>
+  <div class="sep"></div>
+  <a href="#desktop">Desktop Application</a>
+  <a class="sub" href="#desktop-tauri">Tauri Shell</a>
+  <a class="sub" href="#desktop-sidecar">Sidecar &amp; Worker</a>
+  <a class="sub" href="#desktop-build">Build Pipeline</a>
+  <a class="sub" href="#desktop-setup">First-Run Setup</a>
+  <a href="#licensing">Licensing</a>
+  <a href="#file-mgmt">File Management</a>
+  <a href="#versioning">Version Tracking</a>
+  <div class="sep"></div>
+  <a href="#frontend">Frontend &amp; HUD</a>
+  <a href="#api">REST API</a>
+  <a href="#use-cases">Use Cases</a>
+</nav>
+
+<main>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h1 id="intro">
+  Paradox Solutions LLM
+  <small>A Technical Reference for the Curious, the Skeptical, and the Slightly Obsessed &mdash; v0.3.1</small>
+</h1>
+
+<p>The universe, as everyone who has ever tried to parse a malformed JSON response knows, is fundamentally hostile to good data. It is a truth universally acknowledged that a local language model in possession of a good GPU must be in want of a proper architecture around it. Otherwise it just sits there, hallucinating URLs and insisting that the capital of France is "approximately Paris, confidence 0.4."</p>
+
+<p>This document describes <strong>Paradox Solutions LLM</strong>: a fully local AI research assistant that runs on your hardware, sends nothing to the cloud, and has been taught — through patient engineering, not magic — to do useful work with EEG data, web research, and the kind of multi-step reasoning that makes smaller models sweat. As of <strong>v0.3.1</strong>, the science stack ships <em>inside the installer</em>: a dedicated <strong>EEG worker executable</strong> carries MNE, SciPy, Plotly, and everything else the visualization pipeline needs, so that the operator need not wrestle a Python venv into shape before the brain can speak. The most dangerous phrase in neurotech — "we've always required a separate science install" — no longer applies.</p>
+
+<p>Every layer is documented here. Every formula. Every decision about why the system works the way it does, rather than some other way that would have been easier to build and harder to trust. A ship in harbor is safe, but that is not what ships are built for — and this system was built to sail.</p>
+
+<blockquote>A system that cannot explain itself is not an assistant. It is a liability with a chat interface.</blockquote>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="architecture">Architecture Overview</h2>
+
+<p>Paradox is seven layers of software wrapped around two local language models, a vector database, and — as of v0.3.1 — a frozen science worker that carries an entire EEG analysis laboratory in a single executable. Each layer does exactly one job. None of them are optional in the way that seatbelts are optional — technically you can remove them, but the first time you hit a wall you'll wish you hadn't. Million-to-one chances of getting away with it crop up nine times out of ten, but only in fiction.</p>
+
+<div class="diagram">
+  <div class="box">Tauri Desktop</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">Next.js UI</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">FastAPI</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box active">Agent Loop</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">Tool Registry</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">Ollama (LLM)</div>
+</div>
+<div class="diagram">
+  <div class="box">Symbolic Router</div>
+  <div class="arrow">&darr;</div>
+  <div class="box">ChromaDB Memory</div>
+  <div class="arrow">&darr;</div>
+  <div class="box">Reflection Engine</div>
+  <div class="arrow">&darr;</div>
+  <div class="box">MNE-Python</div>
+</div>
+<div class="diagram">
+  <div class="box">License Manager</div>
+  <div class="arrow">&darr;</div>
+  <div class="box">File Manager</div>
+  <div class="arrow">&darr;</div>
+  <div class="box active">GPU Optimizations</div>
+  <div class="arrow">&darr;</div>
+  <div class="box">Embed Quantizer</div>
+</div>
+<div class="diagram">
+  <div class="box active">EEG Worker (.exe)</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">MNE + SciPy + Plotly</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">NetOps &amp; Granger</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">HTML Dashboards</div>
+</div>
+
+<table>
+  <tr><th>Layer</th><th>Technology</th><th>Responsibility</th></tr>
+  <tr><td>Desktop</td><td>Tauri v2 (Rust)</td><td>Native window, system tray, sidecar management, NSIS/MSI installers</td></tr>
+  <tr><td>Frontend</td><td>Next.js, React, Tailwind</td><td>Chat UI, file upload, license panel, optimization status</td></tr>
+  <tr><td>API</td><td>FastAPI, Pydantic</td><td>HTTP endpoints, CORS, file management, license proxy</td></tr>
+  <tr><td>Agent</td><td>Python (ReAct v2)</td><td>Think &rarr; Act &rarr; Observe &rarr; Answer loop</td></tr>
+  <tr><td>Symbolic</td><td>YAML + regex</td><td>Deterministic tool routing hints</td></tr>
+  <tr><td>LLM</td><td>Ollama (Qwen3:8B, phi4-mini)</td><td>Reasoning, generation, classification (flash attention + quantized KV cache)</td></tr>
+  <tr><td>Memory</td><td>ChromaDB + nomic-embed-text</td><td>Persistent vector storage with weighted scoring + quantized embeddings</td></tr>
+  <tr><td>Optimization</td><td>Flash Attn, KV quant, embed quant</td><td>VRAM efficiency, inference speed, storage compression</td></tr>
+  <tr><td>EEG Worker</td><td>PyInstaller (frozen)</td><td>Bundled <code>paradox-eeg-worker.exe</code>: MNE, SciPy, Matplotlib, Plotly, scikit-learn, networkx, statsmodels — runs viz subprocesses without a separate Python install</td></tr>
+  <tr><td>Licensing</td><td>RSA, machine fingerprint</td><td>Offline activation, feature flags, per-machine binding</td></tr>
+  <tr><td>Tools</td><td>Python modules</td><td>Web search, EEG analysis, research, system info (license-gated)</td></tr>
+</table>
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="data-flow">End-to-End Data Flow</h2>
+
+<p>When you type a question and press Enter, here is what actually happens. Not approximately. Not "the LLM figures it out." <em>Exactly</em> this:</p>
+
+<ol>
+  <li>The <strong>Next.js frontend</strong> sends <code>POST /agent</code> with your message to port 8765.</li>
+  <li>FastAPI validates the request and calls <code>run_agent()</code>.</li>
+  <li>The <strong>dual-model router</strong> asks phi4-mini: "Is this DIRECT or AGENT?" If DIRECT (simple factual question), phi4-mini answers immediately — no tool calls, no agent loop. Response in ~2 seconds.</li>
+  <li>If AGENT, the full <strong>ReAct loop</strong> begins. The system prompt is assembled from: static rules, current date, EEG domain knowledge (if enabled), tool descriptions, the current focus document, and any neuro-symbolic hints triggered by your query.</li>
+  <li>Qwen3:8B generates a JSON response: <code>{"thought": "...", "action": "web_search", "action_input": {"query": "..."}, "answer": null, "confidence": 0.0}</code></li>
+  <li>The <strong>tool registry</strong> dispatches the action to the appropriate tool module.</li>
+  <li>The tool runs, produces a <code>ToolResult</code>, and the observation is formatted and injected back into the conversation.</li>
+  <li>The model reads the observation and either calls another tool or produces a final answer.</li>
+  <li>The answer is passed through <strong>URL validation</strong> (fabricated links are stripped) and <strong>Markdown formatting</strong>.</li>
+  <li>The conversation is embedded and stored in <strong>ChromaDB</strong> for future recall.</li>
+  <li>The formatted answer returns to the frontend and renders as rich Markdown with clickable links.</li>
+</ol>
+
+<p>Maximum agent steps: <strong>8</strong>. In practice, most queries resolve in 2. The system is designed to be parsimonious with compute — every tool call costs time, and time on a local GPU is not free.</p>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="layer-1">Layer 1: Configuration</h2>
+
+<p>All configuration flows from a single Pydantic <code>Settings</code> class that reads <code>.env</code> at startup. Nothing is hardcoded that should be soft. Nothing is soft that should be hard. The distinction between the two is the thing that separates engineering from typing.</p>
+
+<details>
+<summary>Full Configuration Reference</summary>
+<div class="details-body">
+<table>
+  <tr><th>Setting</th><th>Default</th><th>Purpose</th></tr>
+  <tr><td><code>chat_model</code></td><td><code>qwen3:8b</code></td><td>Primary reasoning model</td></tr>
+  <tr><td><code>fast_model</code></td><td><code>""</code> (disabled)</td><td>Lightweight router/answerer (e.g. <code>phi4-mini</code>)</td></tr>
+  <tr><td><code>embed_model</code></td><td><code>nomic-embed-text</code></td><td>Embedding model for ChromaDB vectors</td></tr>
+  <tr><td><code>ollama_chat_num_ctx</code></td><td><code>16384</code></td><td>Context window size (tokens)</td></tr>
+  <tr><td><code>ollama_chat_num_predict</code></td><td><code>4096</code></td><td>Max generation tokens per turn</td></tr>
+  <tr><td><code>agent_max_steps</code></td><td><code>8</code></td><td>ReAct loop budget</td></tr>
+  <tr><td><code>confidence_threshold</code></td><td><code>0.75</code></td><td>Minimum confidence to accept an answer</td></tr>
+  <tr><td><code>memory_w_sim</code></td><td><code>0.45</code></td><td>Weight: cosine similarity</td></tr>
+  <tr><td><code>memory_w_imp</code></td><td><code>0.20</code></td><td>Weight: importance score</td></tr>
+  <tr><td><code>memory_w_rec</code></td><td><code>0.20</code></td><td>Weight: recency decay</td></tr>
+  <tr><td><code>memory_w_boost</code></td><td><code>0.15</code></td><td>Weight: manual boost</td></tr>
+  <tr><td><code>memory_recency_half_life_days</code></td><td><code>14.0</code></td><td>Exponential decay half-life</td></tr>
+  <tr><td><code>eeg_domain_enabled</code></td><td><code>true</code></td><td>Inject EEG knowledge into system prompt</td></tr>
+  <tr><td><code>python_analysis_timeout</code></td><td><code>300</code></td><td>Max seconds for MNE scripts</td></tr>
+  <tr><td><code>symbolic_enabled</code></td><td><code>true</code></td><td>Enable regex-based tool routing</td></tr>
+  <tr><td><code>web_search_auto_fetch</code></td><td><code>true</code></td><td>Auto-fetch and parse search result pages</td></tr>
+  <tr><td colspan="3" style="color:var(--cyan-dim); font-style:italic; padding-top:.6rem;">EEG subprocess resolution (v0.3.1)</td></tr>
+  <tr><td><code>PARADOX_EEG_PYTHON</code></td><td><em>(env var)</em></td><td>Override the interpreter used for EEG visualization subprocesses. When set, the API uses this path instead of auto-detection. Preferred name.</td></tr>
+  <tr><td><code>EEG_PYTHON</code></td><td><em>(env var)</em></td><td>Legacy alias for <code>PARADOX_EEG_PYTHON</code>. Checked when the preferred name is absent.</td></tr>
+</table>
+
+<p>When the API is running as a frozen PyInstaller bundle, it prefers <strong><code>paradox-eeg-worker.exe</code></strong> from the <code>eeg-worker/</code> directory beside the main binary. If the worker is absent, it falls back to the environment-variable override, then to <code>py -3</code>, then to <code>python</code> on <code>PATH</code>. One accurate measurement — confirmed by <code>GET /health</code> &rarr; <code>eeg_subprocess</code> — is worth a thousand expert opinions about which interpreter the system might be using.</p>
+</div>
+</details>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="layer-2">Layer 2: Ollama Client</h2>
+
+<p>The Ollama client is the system's mouth and ears. It speaks to the local Ollama server over HTTP, and its primary job is to make the models' output <em>parseable</em> — which, with local models, is about as straightforward as herding cats through a JSON schema.</p>
+
+<p>Light thinks it travels faster than anything, but a read timeout finds the darkness has always got there first. When Ollama takes longer than the configured <code>httpx</code> read timeout to generate a response — a large model, an overloaded GPU, the digital equivalent of an electrode with too much impedance — the system now returns a clean <strong>504 Gateway Timeout</strong> with a human-readable message, rather than an unhandled 500 that tells the operator nothing useful. If you can cut a nanosecond of wire and hold it in your hand, you can certainly hold a timeout in a proper exception handler.</p>
+
+<h3>Key Operations</h3>
+<ul>
+  <li><strong><code>chat(model, messages, temperature, format_json)</code></strong> — Sends messages to <code>/api/chat</code>. When <code>format_json=True</code>, sets Ollama's format parameter to enforce JSON output.</li>
+  <li><strong><code>embed(text)</code></strong> — Calls <code>/api/embeddings</code> with <code>nomic-embed-text</code> to produce 768-dimensional vectors for ChromaDB storage.</li>
+  <li><strong><code>strip_thinking(text)</code></strong> — Qwen3 emits <code>&lt;think&gt;...&lt;/think&gt;</code> reasoning blocks. This strips them before the output reaches the user. The thinking happens; it just doesn't clutter the response.</li>
+  <li><strong><code>parse_json_loose(text)</code></strong> — The real hero. Tries <code>json.loads</code> first. On failure, finds the first <code>{</code> and last <code>}</code> and tries again. This handles the majority of "almost valid JSON" that local models produce — trailing commas, preamble text, nested explanation before the actual object.</li>
+</ul>
+
+<h3>Timeout Handling (v0.3.1)</h3>
+<p>The <code>POST /agent</code> route catches <code>httpx.ReadTimeout</code>, <code>httpx.ConnectTimeout</code>, and <code>httpx.ConnectError</code> from the Ollama call and translates them into proper HTTP status codes:</p>
+<table>
+  <tr><th>Exception</th><th>HTTP Status</th><th>Meaning</th></tr>
+  <tr><td><code>ReadTimeout</code></td><td><strong>504</strong></td><td>Ollama accepted the request but didn't finish in time</td></tr>
+  <tr><td><code>ConnectTimeout</code></td><td><strong>504</strong></td><td>Could not reach Ollama within the connect window</td></tr>
+  <tr><td><code>ConnectError</code></td><td><strong>502</strong></td><td>Ollama is not running or unreachable</td></tr>
+</table>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="layer-3">Layer 3: Vector Memory</h2>
+
+<p>Memory is what separates a useful assistant from a goldfish with delusions of competence. Paradox stores everything in <strong>ChromaDB</strong> with three persistent collections:</p>
+
+<table>
+  <tr><th>Collection</th><th>Contents</th><th>Typical Entries</th></tr>
+  <tr><td><code>chat_history</code></td><td>Every conversation turn (user + assistant)</td><td>Thousands over weeks of use</td></tr>
+  <tr><td><code>documents</code></td><td>Ingested files, reflection outputs</td><td>Research papers, clinical notes, reflections</td></tr>
+  <tr><td><code>library</code></td><td>Chunked reference material</td><td>PDFs, EEG reference docs, protocol guides</td></tr>
+</table>
+
+<h3>The Scoring Formula</h3>
+
+<p>Raw ChromaDB returns a <em>distance</em>. Distance is not relevance. The system converts distance to similarity and then blends four signals into a single score:</p>
+
+<div class="math">
+  similarity = 1 / (1 + distance)
+</div>
+
+<div class="math">
+  recency = e<sup> −age_days / half_life</sup>
+</div>
+
+<div class="math">
+  score = w₁·similarity + w₂·importance + w₃·recency + w₄·manual_boost
+</div>
+
+<p>Where weights are <strong>normalized</strong> to sum to 1.0 before blending:</p>
+
+<div class="math">
+  wᵢ = raw_wᵢ / Σ raw_wⱼ
+</div>
+
+<details>
+<summary>Default weight breakdown</summary>
+<div class="details-body">
+<table>
+  <tr><th>Signal</th><th>Raw Weight</th><th>Normalized</th><th>What It Measures</th></tr>
+  <tr><td>Similarity</td><td>0.45</td><td>45%</td><td>Cosine distance from the query embedding</td></tr>
+  <tr><td>Importance</td><td>0.20</td><td>20%</td><td>Assigned at ingestion; bumped +0.02 on each access (capped at 1.0)</td></tr>
+  <tr><td>Recency</td><td>0.20</td><td>20%</td><td>Exponential decay: half-life of 14 days</td></tr>
+  <tr><td>Manual Boost</td><td>0.15</td><td>15%</td><td>Operator or tool can mark memories as important</td></tr>
+</table>
+
+<p>The <strong>recency decay</strong> uses a natural exponential with configurable half-life. A memory from 14 days ago scores 0.5 on recency. A memory from 28 days ago scores 0.25. A memory from yesterday scores ~0.95. This means the system naturally forgets noise while preserving things you keep asking about (which get importance bumps on access).</p>
+
+<p>The formula is deliberately simple. Complex scoring functions are difficult to debug, and when your memory system returns the wrong document, you need to be able to look at four numbers and say "ah, the recency killed it" — not stare at a neural attention matrix wondering which head made the mistake.</p>
+</div>
+</details>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="layer-4">Layer 4: Neuro-Symbolic Router</h2>
+
+<p>Before the LLM even sees your message, a set of regex patterns fires against it. This is not AI. This is the computational equivalent of a well-organized filing cabinet — deterministic, fast, and immune to hallucination.</p>
+
+<p>Each rule is a YAML entry with a regex <code>pattern</code> and a <code>text</code> hint. If the pattern matches, the hint is injected into the system prompt. The LLM reads it as guidance, not as a command — a suggestion from someone who has seen this kind of question before.</p>
+
+<pre><code><span class="cm"># From default_rules.yaml</span>
+- <span class="kw">pattern</span>: <span class="st">"(?i)(QEEG|quantitative EEG|brain.?map|z.?score)"</span>
+  <span class="kw">text</span>: &gt;
+    QEEG involves computing absolute/relative band power per channel
+    and comparing to normative databases. Use run_python_analysis
+    with MNE for PSDs, then plot topomaps...</code></pre>
+
+<p>There are <strong>30+ rules</strong> covering: general system queries, EEG software platforms (NeuroGuide, BrainMaster, BioExplorer, BioEra, Cygnet, OpenBCI, EEGLAB, Brain Products), analysis methods (spectral, ERP, ICA, connectivity, source localization), file formats, and research queries.</p>
+
+<p>The rules engine has zero latency cost. A regex match takes microseconds. The hint text adds maybe 200 tokens to the prompt. The payoff is that an 8B model, which might otherwise flail when asked about sLORETA inverse solutions, gets a roadmap in its context window before it starts generating.</p>
+
+<blockquote>Deterministic routing layered on probabilistic inference. The filing cabinet tells the imagination where to look.</blockquote>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="layer-5">Layer 5: The Agent Loop (ReAct v2)</h2>
+
+<p>The agent loop is where thinking happens. Not in the metaphysical sense — in the very literal sense of "the model outputs a JSON object with a field called <code>thought</code>."</p>
+
+<h3>The ReAct Pattern</h3>
+<p>Each step, the model produces:</p>
+<pre><code>{
+  <span class="st">"thought"</span>: <span class="st">"I need to find the 2026 Suisun Summit dates..."</span>,
+  <span class="st">"action"</span>: <span class="st">"web_search"</span>,
+  <span class="st">"action_input"</span>: {<span class="st">"query"</span>: <span class="st">"suisun neuroscience summit 2026"</span>},
+  <span class="st">"answer"</span>: <span class="kw">null</span>,
+  <span class="st">"confidence"</span>: <span class="num">0.0</span>
+}</code></pre>
+
+<p>When the model has enough information, it sets <code>action</code> to null and fills in the <code>answer</code>:</p>
+<pre><code>{
+  <span class="st">"thought"</span>: <span class="st">"The search found the official page..."</span>,
+  <span class="st">"action"</span>: <span class="kw">null</span>,
+  <span class="st">"action_input"</span>: {},
+  <span class="st">"answer"</span>: <span class="st">"The 2026 Suisun Neuroscience Summit..."</span>,
+  <span class="st">"confidence"</span>: <span class="num">0.85</span>
+}</code></pre>
+
+<h3>Dual-Model Routing</h3>
+
+<div class="layer-card">
+  <h4>The Fast Path (phi4-mini)</h4>
+  <p>Simple questions — "what is the capital of France," "convert 5 miles to km" — don't need web search, tool calls, or multi-step reasoning. The router asks phi4-mini to classify the query as <code>DIRECT</code> or <code>AGENT</code>. Direct queries get answered immediately by phi4-mini itself. This saves 30-50 seconds of unnecessary agent loop time for questions the model already knows.</p>
+</div>
+
+<h3>Safety Rails</h3>
+<ul>
+  <li><strong>Repeat tool guard:</strong> If the model calls the same tool twice, the loop force-stops and extracts a fallback answer from whatever observations exist. Scientists have calculated that the chances of an 8B model getting stuck in a loop are significant; this guard ensures that when it does, the system fails gracefully rather than burning through all eight steps asking the same question.</li>
+  <li><strong>Final step nudge:</strong> On the last step, the system injects: "You MUST provide your best answer now. Do NOT call another tool." This guarantees the loop terminates with output.</li>
+  <li><strong>Confidence gating:</strong> If confidence is below 0.75 and a remote Skye model is configured, the answer gets escalated for a second opinion.</li>
+  <li><strong>URL validation:</strong> Any URLs in the final answer that weren't observed during tool execution get stripped. The model cannot fabricate links.</li>
+</ul>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="layer-6">Layer 6: System Prompt Assembly</h2>
+
+<p>The system prompt is not a static string. It is <em>assembled</em> at the start of each agent run from multiple sources:</p>
+
+<ol>
+  <li><strong>Identity and rules</strong> — who the model is, the ReAct format, behavioral rules (never invent URLs, call web_search at most once, ignore irrelevant results)</li>
+  <li><strong>Current date</strong> — injected as <code>Today: {date}. Year: {year}.</code> so the model knows what year it is. This sounds obvious. It was not obvious to the model without it.</li>
+  <li><strong>Current focus</strong> — the reflection engine's latest output, telling the model what topics it's been working on recently</li>
+  <li><strong>Symbolic hints</strong> — regex-matched guidance for the current query</li>
+  <li><strong>EEG domain knowledge</strong> — frequency band tables, pipeline steps, software compatibility, tool hints</li>
+  <li><strong>Tool descriptions</strong> — what each tool does and what parameters it accepts</li>
+  <li><strong><code>/no_think</code></strong> — a directive to suppress Qwen3's thinking tags in output</li>
+</ol>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="layer-7">Layer 7: Answer Formatting &amp; Validation</h2>
+
+<p>The raw output from an 8B model is, to put it diplomatically, not always what you'd show a client. The answer formatter handles:</p>
+
+<ul>
+  <li><strong>JSON leak cleanup:</strong> Sometimes the model wraps its answer in <code>{"answer": "..."}</code> instead of providing plain text. The formatter detects ReAct-shaped payloads and extracts the answer field.</li>
+  <li><strong>Dict-to-Markdown conversion:</strong> If the answer is accidentally structured as a Python dict, it gets rendered as readable Markdown sections.</li>
+  <li><strong>URL validation:</strong> Every <code>[text](url)</code> link is checked against the set of URLs actually observed during tool execution. If the domain doesn't match any known URL, the link is stripped and only the anchor text remains. This is the anti-hallucination firewall for links.</li>
+</ul>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="tools">Tool Catalog</h2>
+
+<p>Tools are the agent's hands. Each is a Python class inheriting from <code>Tool</code>, auto-discovered by the registry at startup. The registry introspects function signatures so the LLM only sees the parameters each tool actually accepts.</p>
+
+
+<!-- ── WEB SEARCH ── -->
+<h3 id="tool-websearch">web_search</h3>
+
+<p>The web search tool is the most complex tool in the system. A single call triggers a multi-phase pipeline that generates query variants, searches multiple times with staggered execution, scores results by relevance, probes for current-year URLs, fetches full page content, and follows outbound links one hop deep.</p>
+
+<details>
+<summary>Relevance Scoring Algorithm</summary>
+<div class="details-body">
+<div class="math">
+  relevance(item) = |{ kw ∈ keywords : kw ∈ (title ∪ body ∪ url) }| / |keywords|
+</div>
+<p>This is keyword overlap, not semantic similarity. It's fast, it's deterministic, and for web search result ranking it works better than trying to embed search snippets on the fly. A result containing 4 out of 4 query keywords is almost certainly more relevant than one containing 1 out of 4.</p>
+</div>
+</details>
+
+<details>
+<summary>Query Variant Generation</summary>
+<div class="details-body">
+<p>Given a user query like "when is the next Suisun Neuroscience Summit?", the system generates:</p>
+<ul>
+  <li>Original query (as-is)</li>
+  <li>Short keyword form + current year: <code>suisun summit 2026</code></li>
+  <li>Event-word extraction: detects "summit," "conference," etc. and builds minimal forms</li>
+  <li><strong>Adjacent keyword concatenation:</strong> If two short keywords appear next to each other (e.g. "sui" + "sun"), they're joined to try "suisun" — catching split-word typos that search engines can't resolve</li>
+  <li>Bare keywords without year for broader coverage</li>
+</ul>
+</div>
+</details>
+
+<details>
+<summary>URL Probing</summary>
+<div class="details-body">
+<p>When search results contain year-specific paths (e.g. <code>/suisun-summit-2025/</code>), the tool generates the current-year equivalent (<code>/suisun-summit-2026/</code>) and tests it. It also builds subdomain probes from query keywords — finding <code>eegstrategies.com</code> in results triggers a probe of <code>suisun.eegstrategies.com</code>.</p>
+</div>
+</details>
+
+<details>
+<summary>Answer Data Assembly</summary>
+<div class="details-body">
+<p>All fetched pages are scored with a year-boosted relevance formula:</p>
+<div class="math">
+  score = base_relevance + 0.3 × [current_year ∈ text] − 0.05 × [only_prev_year ∈ text]
+</div>
+<p>The top sources are ranked and formatted into an <code>ANSWER DATA</code> block that tells the LLM: "Here are the facts. Here are the links. Use the best source. Do not search again."</p>
+</div>
+</details>
+
+
+<!-- ── DEEP RESEARCH ── -->
+<h3 id="tool-deepresearch">deep_research</h3>
+
+<p>When <code>web_search</code> is a flashlight, <code>deep_research</code> is a searchlight battery. It queries three sources in parallel:</p>
+
+<ul>
+  <li><strong>DuckDuckGo</strong> — general web results</li>
+  <li><strong>PubMed</strong> — biomedical literature (HTML scraping of search results)</li>
+  <li><strong>Google Scholar</strong> — academic papers (HTML scraping)</li>
+</ul>
+
+<p>Results are fetched, deduplicated by URL, and content is extracted via Trafilatura. PDFs are handled through pypdf. All fetched content is cached in a <strong>SQLite database</strong> with gzip compression and a 48-hour TTL, keyed by MD5 hash of the URL. This means repeated research on the same topic doesn't re-fetch pages.</p>
+
+
+<!-- ── FETCH URL ── -->
+<h3 id="tool-fetch">fetch_url</h3>
+
+<p>Single-URL fetch with retry logic and backoff on 429/5xx responses. Shares the deep_research content cache. Handles both HTML (via Trafilatura) and PDF (via pypdf) transparently.</p>
+
+
+<!-- ── PYTHON ANALYSIS ── -->
+<h3 id="tool-python">run_python_analysis</h3>
+
+<p>This is where the system becomes genuinely dangerous — in the good way. The agent writes a Python script, and the system executes it in a subprocess with:</p>
+
+<ul>
+  <li>Working directory set to <code>eeg_workspace</code></li>
+  <li>Matplotlib forced to <code>Agg</code> backend (no display server needed)</li>
+  <li>Timeout of 300 seconds (configurable)</li>
+  <li><strong>Up to 2 automatic retries</strong> with error-specific fixes: missing ICLabel imports, montage parameter corrections, common MNE API changes</li>
+  <li>Output file detection — after execution, it scans the output directory for new files and reports them</li>
+</ul>
+
+<p>The agent can write arbitrary MNE-Python scripts: load EEG files, apply filters, run ICA, compute PSDs, generate topomaps, analyze connectivity — whatever the analysis requires. If the script crashes, the agent reads the traceback, fixes the code, and tries again. Automatically. It is easier to ask forgiveness than to get permission — and easier still to catch the <code>ModuleNotFoundError</code>, add the import, and re-run before anyone notices.</p>
+
+
+<!-- ── EEG PIPELINE ── -->
+<h3 id="tool-pipeline">run_eeg_pipeline</h3>
+
+<p>For when you want the full treatment. Generates and executes a 24-step preprocessing and analysis pipeline. See the <a href="#eeg-pipeline">EEG Analysis Deep Dive</a> below.</p>
+
+
+<!-- ── MEMORY ── -->
+<h3 id="tool-memory">Memory Tools</h3>
+
+<table>
+  <tr><th>Tool</th><th>Purpose</th></tr>
+  <tr><td><code>query_memory</code></td><td>Semantic search across all collections; bumps access count and importance on hit</td></tr>
+  <tr><td><code>boost_memory</code></td><td>Manually mark specific memories as important (increases both importance and manual_boost)</td></tr>
+  <tr><td><code>ingest_document</code></td><td>Chunk and embed files (PDF, TXT, MD) or EDF/BDF headers into the library</td></tr>
+  <tr><td><code>run_reflection</code></td><td>Trigger a reflection pass over recent memory</td></tr>
+</table>
+
+
+<!-- ── SYSTEM ── -->
+<h3 id="tool-system">System &amp; Utility Tools</h3>
+
+<table>
+  <tr><th>Tool</th><th>What It Does</th></tr>
+  <tr><td><code>get_system_stats</code></td><td>CPU, RAM, disk via psutil; GPU via nvidia-smi CSV parsing</td></tr>
+  <tr><td><code>get_realtime_stats</code></td><td>Top processes by memory usage, boot time</td></tr>
+  <tr><td><code>get_datetime</code></td><td>Current date/time with timezone support</td></tr>
+  <tr><td><code>run_shell_command</code></td><td>Allowlisted presets only: nvidia-smi, netstat, MNE info, pip list, list EEG files</td></tr>
+  <tr><td><code>skye_infer</code></td><td>Direct query to a remote Ollama instance (optional Skye model)</td></tr>
+  <tr><td><code>send_discord_message</code></td><td>Post to a Discord channel via REST API</td></tr>
+</table>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="eeg">EEG Analysis Deep Dive</h2>
+
+<p>EEG — electroencephalography — is the art of listening to the brain's electrical conversation through the skull. It is noisy, it is subtle, and it is one of the few non-invasive windows we have into what billions of neurons are doing at any given moment. The signal you record at the scalp is the sum of postsynaptic potentials from millions of cortical pyramidal cells, attenuated by bone, fluid, and skin, contaminated by eye blinks, muscle tension, line noise, and the occasional loose electrode. Half a million of these recordings, reviewed by clinicians who learned to read the patterns the way a sailor reads the sea, produced the phenotype classifications that inform how this system interprets what it measures. The EEG does not tell you what the DSM says the patient has; it tells you what the cortex is doing. These are not always the same thing, and when they disagree, the cortex is not the one that is wrong.</p>
+
+<p>Paradox's EEG stack is built on <strong>MNE-Python</strong>, the open-source gold standard for M/EEG analysis, extended with autoreject, MNE-ICALabel, and MNE-Connectivity.</p>
+
+
+<h3 id="eeg-pipeline">The 24-Step Pipeline</h3>
+
+<p>Every step is wrapped in try/except. The pipeline continues even if individual stages fail, producing a partial report rather than nothing. In clinical and research contexts, <em>some</em> analysis is always better than a crash dump. Silent <code>except: pass</code> blocks — the software equivalent of ignoring a flat EEG and calling it "normal" — have been systematically replaced with <code>logger.warning</code> so failures are visible. Light may always find the darkness waiting, but it should at least report what it found there.</p>
+
+<details>
+<summary><strong>Steps 1-3:</strong> Load, Diagnose, Visualize</summary>
+<div class="details-body">
+<h4>Step 1: Data Loading</h4>
+<p>Auto-detects format from extension and dispatches to the correct MNE reader:</p>
+<table>
+  <tr><th>Extension</th><th>Reader</th><th>Source Systems</th></tr>
+  <tr><td>.edf</td><td><code>read_raw_edf</code></td><td>NeuroGuide, BrainMaster, BioExplorer, Cygnet, most clinical EEG</td></tr>
+  <tr><td>.bdf</td><td><code>read_raw_bdf</code></td><td>BioSemi, OpenBCI (24-bit)</td></tr>
+  <tr><td>.fif</td><td><code>read_raw_fif</code></td><td>MNE native, Elekta/MEGIN</td></tr>
+  <tr><td>.set</td><td><code>read_raw_eeglab</code></td><td>EEGLAB (MATLAB)</td></tr>
+  <tr><td>.vhdr</td><td><code>read_raw_brainvision</code></td><td>Brain Products (actiCHamp)</td></tr>
+  <tr><td>.cnt</td><td><code>read_raw_cnt</code></td><td>Neuroscan</td></tr>
+  <tr><td>.gdf</td><td><code>read_raw_gdf</code></td><td>General Data Format</td></tr>
+</table>
+<p>Attempts to apply the International 10-20 montage automatically. If channel names don't match standard positions, it warns but continues.</p>
+
+<h4>Step 2: Quality Diagnostics</h4>
+<p>Computes per-channel <strong>variance</strong>, <strong>kurtosis</strong> (via SciPy), and <strong>peak-to-peak range</strong>. Channels with variance below 10⁻¹² are flagged as flatlines — dead electrodes producing no signal.</p>
+
+<h4>Step 3: Baseline PSD Visualization</h4>
+<p>Computes and plots the power spectral density of the raw (unprocessed) data. This is your "before" picture — you'll compare it to the cleaned PSD at Step 22.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Steps 4-8:</strong> Filtering &amp; Channel Cleaning</summary>
+<div class="details-body">
+<h4>Step 4: Bandpass Filter</h4>
+<p>FIR filter with default passband <strong>0.5 – 40 Hz</strong>. The high-pass at 0.5 Hz removes slow drifts (sweat artifacts, electrode motion). The low-pass at 40 Hz attenuates EMG contamination. MNE uses a windowed-sinc FIR by default — phase-linear, no group delay distortion.</p>
+
+<h4>Step 5: Notch Filter</h4>
+<p>Removes power line interference at <strong>60 Hz</strong> (North America) or 50 Hz (configurable). If the first harmonic falls within the low-pass cutoff, it's notched too.</p>
+
+<h4>Step 6: Bad Channel Detection</h4>
+<div class="math">
+  bad if: variance(ch) > 10 × median(variance) <strong>or</strong> variance(ch) < 0.01 × median(variance)
+</div>
+<p>Channels with abnormally high variance are noisy (loose electrode, bridging). Channels with abnormally low variance are dead or saturated. The 10× and 0.01× thresholds are deliberately conservative — you'd rather interpolate one extra channel than let a noisy one corrupt your ICA.</p>
+
+<h4>Step 7: Spherical Spline Interpolation</h4>
+<p>Bad channels are reconstructed from their neighbors using MNE's spherical spline interpolation (Perrin et al., 1989). Requires electrode positions (montage).</p>
+
+<h4>Step 8: Average Re-reference</h4>
+<p>All channels are re-referenced to the common average. This approximates a reference-free recording and is the standard for QEEG and connectivity analysis. The math is simple:</p>
+<div class="math">
+  V'ᵢ(t) = Vᵢ(t) − (1/N) Σⱼ Vⱼ(t)
+</div>
+</div>
+</details>
+
+<details>
+<summary><strong>Steps 9-12:</strong> ICA Artifact Removal</summary>
+<div class="details-body">
+<h4>Step 9: Matrix Rank</h4>
+<p>Computes the numerical rank of the data matrix via SVD. This determines the maximum number of ICA components — you cannot extract more independent sources than the rank of your data.</p>
+
+<h4>Step 10: ICA Decomposition</h4>
+<p>Fits <strong>FastICA</strong> (default) to decompose the signal into maximally statistically independent components. Each component is a spatial pattern (weights across channels) times a time course. Eye blinks, heartbeat, and muscle artifacts typically separate into distinct components because they're generated by independent physical sources.</p>
+<div class="math">
+  X = A · S → S = W · X
+</div>
+<p>Where X is the data matrix, A is the mixing matrix, S is the source matrix, and W = A⁻¹ is the unmixing matrix found by maximizing non-Gaussianity of the sources.</p>
+
+<h4>Step 11: Component Classification (ICLabel)</h4>
+<p>Uses <strong>MNE-ICALabel</strong> — a convolutional neural network trained on thousands of labeled ICA components — to classify each component as: Brain, Eye, Heart, Muscle, Line Noise, Channel Noise, or Other.</p>
+<p>Components classified as non-brain with probability ≥ <strong>0.80</strong> (configurable) are marked for exclusion. If ICLabel is unavailable, falls back to EOG correlation (find components correlated with eye channels).</p>
+
+<h4>Step 12: Signal Reconstruction</h4>
+<p>Excluded components are removed and the signal is reconstructed:</p>
+<div class="math">
+  X_clean = A_brain · S_brain
+</div>
+<p>Where only the brain-classified columns of A and rows of S are used in the multiplication.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Steps 13-17:</strong> Epochs &amp; ERPs</summary>
+<div class="details-body">
+<h4>Step 13: Event Detection</h4>
+<p>Finds stimulus markers in the recording. Falls back to annotations if no event channel exists.</p>
+
+<h4>Step 14-15: Epoching &amp; Rejection</h4>
+<p>Data is segmented into time-locked windows around events (default −200ms to +800ms). Epochs exceeding <strong>150 µV</strong> peak-to-peak are rejected. If fewer than 3 events exist, falls back to fixed-length 2-second epochs.</p>
+
+<h4>Step 16: ERP Averaging</h4>
+<p>The Event-Related Potential is the average waveform across all epochs at each channel. By averaging, random noise cancels out and the time-locked neural response emerges:</p>
+<div class="math">
+  ERP(t) = (1/N) Σᵢ epochᵢ(t)
+</div>
+<p>The signal-to-noise ratio improves as √N — 100 epochs gives 10× better SNR than a single trial.</p>
+
+<h4>Step 17: ERP Image</h4>
+<p>Generates a 2D image with trials on the y-axis and time on the x-axis, color-coded by amplitude. Useful for spotting trial-by-trial variability and systematic drifts.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Steps 18-21:</strong> Spectral &amp; Connectivity Analysis</summary>
+<div class="details-body">
+<h4>Step 18: Time-Frequency (Morlet Wavelets)</h4>
+<p>Decomposes the signal into time-varying frequency content using <strong>Morlet wavelets</strong> — complex sinusoids windowed by a Gaussian. The number of cycles scales with frequency (n_cycles = freq/2), giving better frequency resolution at low frequencies and better time resolution at high frequencies.</p>
+<div class="math">
+  ψ(t, f) = exp(2πift) · exp(−t² / 2σ²) where σ = n_cycles / (2πf)
+</div>
+
+<h4>Step 19: Spectral Band Power (Welch's Method)</h4>
+<p><strong>Welch's method</strong> computes the PSD by dividing the signal into overlapping segments, windowing each (Hamming), computing the FFT, squaring the magnitudes, and averaging:</p>
+<div class="math">
+  PSD(f) = (1/K) Σₖ |FFT(xₖ · w)|² / (fs · Σ w²)
+</div>
+<p>Band power is computed by integrating the PSD over each frequency range:</p>
+<div class="math">
+  Power_band = Σ PSD(f) for f ∈ [f_low, f_high]
+</div>
+<table>
+  <tr><th>Band</th><th>Range</th><th>Clinical Association</th></tr>
+  <tr><td>Delta</td><td>0.5 – 4 Hz</td><td>Deep sleep, cortical inhibition, healing</td></tr>
+  <tr><td>Theta</td><td>4 – 8 Hz</td><td>Drowsiness, meditation, memory encoding</td></tr>
+  <tr><td>Alpha</td><td>8 – 13 Hz</td><td>Relaxed wakefulness, posterior dominant rhythm</td></tr>
+  <tr><td>Beta</td><td>13 – 30 Hz</td><td>Active thinking, focus, anxiety (excess)</td></tr>
+  <tr><td>High Beta</td><td>20 – 30 Hz</td><td>Anxiety, hypervigilance, rumination (subset of beta)</td></tr>
+  <tr><td>Gamma</td><td>30 – 40 Hz</td><td>Binding, higher cognition, perception</td></tr>
+</table>
+<p><strong>v0.3.1 note:</strong> Band ranges are now <em>unified</em> across all modules — <code>band_definitions.py</code>, <code>spectrum_generator.py</code>, the orchestrator, and NetOps copies all agree on <code>beta=(13,30)</code>, <code>hibeta=(20,30)</code>, <code>gamma=(30,40)</code>. Prior to this, inconsistencies meant that "beta power" could mean three different things depending on which code path computed it. When you compare a patient's recording to a normative database, the patient and the database need to be speaking the same frequency language — otherwise you are comparing the electrical equivalent of apples to slightly different apples, and calling the difference "abnormal."</p>
+<p>Topomaps are generated for each band — spatial maps showing the distribution of power across the scalp.</p>
+
+<h4>Step 20: Functional Connectivity</h4>
+<p>Computes <strong>spectral coherence</strong> (default) between all channel pairs using <code>mne-connectivity</code>:</p>
+<div class="math">
+  Coh(f) = |S_xy(f)|² / (S_xx(f) · S_yy(f))
+</div>
+<p>Where S_xy is the cross-spectral density and S_xx, S_yy are auto-spectral densities. Coherence ranges from 0 (independent) to 1 (perfectly phase-locked). Alternative methods available: PLI (Phase Lag Index), PLV (Phase Locking Value).</p>
+
+<h4>Step 21: Network Metrics</h4>
+<div class="math">
+  Node_strength(i) = Σⱼ Con(i,j) / (N − 1)
+</div>
+<div class="math">
+  Global_synchronization = mean(upper_triangle(Con))
+</div>
+<p>Reports the top 5 most strongly connected channel pairs. High global synchronization can indicate over-coupling (epileptiform activity, medication effects). Low values may indicate disconnection syndromes.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Steps 22-24:</strong> Quality Summary &amp; Export</summary>
+<div class="details-body">
+<h4>Step 22: Clean PSD</h4>
+<p>Computes PSD of the cleaned signal for comparison with the raw baseline from Step 3.</p>
+
+<h4>Step 23: Export</h4>
+<p>Saves cleaned raw data (.fif), ICA weights (.fif), and epochs (.fif) to the output directory.</p>
+
+<h4>Step 24: Report &amp; Metrics</h4>
+<p>Generates a human-readable text report and a machine-readable JSON metrics file containing all quality metrics, step statuses, and processing parameters.</p>
+</div>
+</details>
+
+
+<!-- ── EEG MATH ── -->
+<h3 id="eeg-math">Signal Processing Mathematics</h3>
+
+<details>
+<summary>Fourier Transform &amp; PSD</summary>
+<div class="details-body">
+<p>The Discrete Fourier Transform converts time-domain signals to frequency-domain:</p>
+<div class="math">
+  X(k) = Σₙ x(n) · e<sup>−j2πkn/N</sup>
+</div>
+<p>The Power Spectral Density is the squared magnitude of the Fourier coefficients, normalized by the sampling rate and window function. Welch's method reduces variance by averaging multiple windowed segments.</p>
+</div>
+</details>
+
+<details>
+<summary>Independent Component Analysis</summary>
+<div class="details-body">
+<p>ICA assumes the observed signal X is a linear mixture of statistically independent sources S:</p>
+<div class="math">X = A · S</div>
+<p>FastICA finds the unmixing matrix W by maximizing the non-Gaussianity of the estimated sources, typically using negentropy as the contrast function:</p>
+<div class="math">
+  J(y) = [E{G(y)} − E{G(ν)}]²
+</div>
+<p>Where G is a non-quadratic function (e.g., log cosh), y is the estimated source, and ν is a standard Gaussian. The Central Limit Theorem guarantees that the mixture is more Gaussian than any individual source, so maximizing non-Gaussianity recovers the original independent components.</p>
+</div>
+</details>
+
+<details>
+<summary>Morlet Wavelet Transform</summary>
+<div class="details-body">
+<p>The Morlet wavelet is a complex exponential modulated by a Gaussian envelope:</p>
+<div class="math">
+  ψ(t) = π<sup>−1/4</sup> · e<sup>j2πf₀t</sup> · e<sup>−t²/2</sup>
+</div>
+<p>Convolution with the signal gives instantaneous power and phase at each time-frequency point. The trade-off between time and frequency resolution is controlled by the number of cycles parameter — more cycles means better frequency resolution but worse time resolution.</p>
+</div>
+</details>
+
+
+<!-- ── EEG FORMATS ── -->
+<h3 id="eeg-formats">EEG File Formats</h3>
+
+<table>
+  <tr><th>Format</th><th>Extension</th><th>Resolution</th><th>Key Features</th></tr>
+  <tr><td>European Data Format</td><td>.edf</td><td>16-bit</td><td>Universal interchange; most systems export it</td></tr>
+  <tr><td>BioSemi Data Format</td><td>.bdf</td><td>24-bit</td><td>Higher dynamic range; EDF+ variant</td></tr>
+  <tr><td>MNE/Elekta FIF</td><td>.fif</td><td>Float</td><td>Native MNE; stores raw, epochs, evoked, forward, inverse</td></tr>
+  <tr><td>BrainVision</td><td>.vhdr</td><td>Various</td><td>Triplet: .vhdr (header) + .vmrk (markers) + .eeg (data)</td></tr>
+  <tr><td>EEGLAB</td><td>.set</td><td>Various</td><td>MATLAB structure; data in .fdt companion file</td></tr>
+</table>
+
+
+<!-- ── EEG SOFTWARE ── -->
+<h3 id="eeg-software">Software Ecosystem Compatibility</h3>
+
+<table>
+  <tr><th>Software</th><th>Export Format</th><th>Typical Use</th><th>MNE Loader</th></tr>
+  <tr><td>NeuroGuide</td><td>EDF</td><td>QEEG, z-scores, sLORETA</td><td><code>read_raw_edf</code></td></tr>
+  <tr><td>BrainMaster</td><td>EDF/BDF</td><td>Discovery, Atlantis, BrainAvatar</td><td><code>read_raw_edf/bdf</code></td></tr>
+  <tr><td>BioExplorer</td><td>EDF, CSV</td><td>Visual neurofeedback design</td><td><code>read_raw_edf</code></td></tr>
+  <tr><td>BioEra</td><td>EDF</td><td>Custom biofeedback protocols</td><td><code>read_raw_edf</code></td></tr>
+  <tr><td>Cygnet</td><td>EDF</td><td>Z-score neurofeedback with norms</td><td><code>read_raw_edf</code></td></tr>
+  <tr><td>OpenBCI</td><td>CSV, BDF</td><td>Cyton, Ganglion via BrainFlow</td><td><code>read_raw_bdf</code> / pandas</td></tr>
+  <tr><td>EEGLAB</td><td>.set/.fdt</td><td>MATLAB research ecosystem</td><td><code>read_raw_eeglab</code></td></tr>
+  <tr><td>Brain Products</td><td>.vhdr</td><td>actiCHamp, BrainVision</td><td><code>read_raw_brainvision</code></td></tr>
+  <tr><td>Elekta/MEGIN</td><td>.fif</td><td>MEG + EEG combined</td><td><code>read_raw_fif</code></td></tr>
+</table>
+
+
+<!-- ── INTERACTIVE EEG OUTPUTS ── -->
+<h3 id="eeg-interactive">Interactive Outputs, API Jobs &amp; NetOps Pipeline</h3>
+
+<p>Beyond the 24-step script, Paradox runs a <strong>visualization orchestrator</strong> (<code>hexnode/eeg/viz/run_visualizations.py</code>) after automated preprocessing. It loads cleaned FIF when present (else the original recording), computes per-channel spectra for topomap generators, builds <strong>microstate</strong> figures and interactive HTML, and invokes the <strong>NetOps standalone</strong> bundle (<code>hexnode/eeg/netops_runner.py</code> → <code>netops_standalone/pipeline.py</code>): Granger-style connectivity, multi-policy traceroute, extended analyses, and dozens of standalone HTML dashboards merged into the primary <strong>traceroute interactive</strong> explorer via a dropdown.</p>
+
+<p>The <strong>FastAPI</strong> app exposes EEG operations the web UI consumes:</p>
+<ul>
+  <li><code>POST /eeg/process</code> — multipart upload; spawns a background thread that runs the generated pipeline, clinical helper scripts (e.g. Clinical Q, band power), then the visualization subprocess. Each job writes into <code>data/eeg_workspace/output/&lt;job_id&gt;/</code> with persisted <code>_job.json</code> state.</li>
+  <li><code>GET /eeg/jobs</code>, <code>GET /eeg/jobs/{id}</code> — list and poll status, messages, and output filenames.</li>
+  <li><code>GET /eeg/jobs/{id}/files/{path}</code> — serve artifacts; HTML responses use iframe-friendly headers for in-app preview.</li>
+  <li><code>GET /eeg/outputs</code> / <code>GET /eeg/outputs/{file}</code> — browse the flat global output directory (legacy or non-job files).</li>
+  <li><code>POST /workspace/open</code> — open the output folder in the OS shell (Explorer on Windows).</li>
+</ul>
+
+<p>The <strong>Next.js EEG Data panel</strong> drives upload, polling, and embedded HTML preview. Full operator narrative: <code>doc/user/09-eeg-research.md</code>.</p>
+
+<h3 id="eeg-worker">The Bundled EEG Worker (v0.3.1)</h3>
+
+<p>The most dangerous phrase in the old architecture was "install a proper venv with <code>[eeg]</code> extras." It was fine for developers, but for a clinician who wants to process an EDF and go home, it was the equivalent of asking them to build their own oscilloscope before measuring a signal. Humans are allergic to change — but they are <em>really</em> allergic to debugging pip dependency trees.</p>
+
+<p>As of v0.3.1, the desktop installer bundles <strong><code>paradox-eeg-worker.exe</code></strong>: a dedicated PyInstaller-frozen executable that carries the full science stack — MNE-Python, SciPy, Matplotlib, Plotly, scikit-learn, networkx, statsmodels, and every transitive dependency they drag in. It lives at <code>dist/paradox-api/eeg-worker/paradox-eeg-worker.exe</code>, beside the lean API bundle.</p>
+
+<div class="layer-card">
+  <h4>How the Worker Runs</h4>
+  <p>The entry point is <code>eeg_subprocess_launcher.py</code>, which handles three tasks:</p>
+  <ol>
+    <li><strong>PYTHONPATH injection</strong> — PyInstaller executables do not respect the <code>PYTHONPATH</code> environment variable at startup. The launcher calls <code>_inject_pythonpath()</code> to splice the API bundle's <code>_internal</code> directory onto <code>sys.path</code>, so <code>import hexnode.eeg.*</code> resolves correctly even though the worker was compiled separately.</li>
+    <li><strong><code>--eeg-probe</code> self-test</strong> — Called by <code>GET /health</code> to verify the worker can start, import MNE, and exit cleanly. Timeout: 60 seconds (increased from 25s — the first boot on a cold disk is not the time for impatience).</li>
+    <li><strong><code>runpy</code> dispatch</strong> — Runs the target script (<code>run_visualizations.py</code>, pipeline scripts, clinical scripts) in the worker process with the correct working directory and Matplotlib <code>Agg</code> backend.</li>
+  </ol>
+</div>
+
+<h4>Resolution Order</h4>
+<p>The function <code>python_for_eeg()</code> in <code>hexnode/config.py</code> resolves the interpreter in this order:</p>
+<ol>
+  <li><strong>Bundled worker</strong> — <code>eeg-worker/paradox-eeg-worker.exe</code> relative to the frozen API executable (preferred when <code>sys.frozen</code> is set)</li>
+  <li><strong><code>PARADOX_EEG_PYTHON</code></strong> / <strong><code>EEG_PYTHON</code></strong> — explicit override via environment variable</li>
+  <li><strong>Discovery</strong> — <code>py -3</code> on Windows, then <code>python3</code>, then <code>python</code></li>
+</ol>
+<p>The health endpoint reports exactly which path was chosen, whether the bundled worker was found, and whether <code>run_visualizations.py</code> exists inside the bundle. Check <code>GET /health</code> &rarr; <code>eeg_subprocess</code> — one accurate measurement beats speculation.</p>
+
+
+<h3 id="eeg-clinical-layer">Clinical Summaries, Vigilance &amp; Pattern–Condition</h3>
+
+<p>The NetOps pipeline attaches <strong>per-site metrics</strong> (band power, relative power, ratios), <strong>wPLI</strong> and related connectivity, <strong>slow-wave</strong> proxies, and a <strong>vigilance</strong> block: primary path uses a windowed VIGALL-inspired classifier; a slow-wave-derived fallback fills global state when needed so reports and guards stay populated.</p>
+
+<p><strong>Pattern–condition</strong> analysis (<code>cracker.pattern_condition</code>) ingests markers from metrics, connectivity, and vigilance, evaluates YAML registry rules, and feeds narrative sections in HTML and the agent context.</p>
+
+<p><strong>Clinician summary</strong> (<code>clinician_summary_session.html</code>) is a multi-tab standalone page: Easy / Advanced / Expert views, named methodology tabs (Gunkelman, Swingle ClinicalQ, Fisher, Thatcher, Lubar, Peniston, Sterman, Hammond, Budzynski, Fehmi), driven by flattened per-site metrics and session-relative z where normative keys are absent. It is <em>educational and screening-oriented</em>, not a standalone medical device output.</p>
+
+<p>Additional linked dashboards (non-exhaustive): latency SLA tiers, packet-loss heatmaps, microstate–propagation coupling, PEM, topology/path analytics, runbooks, evidence summaries, TBI/PD-oriented summaries, dedicated vigilance timeline HTML, and pattern–condition evidence panels — exact set depends on successful module import inside the standalone bundle.</p>
+
+
+<h3 id="eeg-phenotypes">Phenotype-Informed Analysis</h3>
+
+<p>Over half a million EEGs, reviewed by hand, reveal a finite set of recurring electrical signatures — patterns that cut across DSM categories and point instead at what the cortex is actually <em>doing</em>. The phenotype model, refined over decades of clinical QEEG practice, identifies eleven candidate clusters that represent intermediate phenotypes between genetics and behavior. Paradox references this framework throughout its clinical outputs, not because software can replace the trained eye that classified those half-million recordings, but because the patterns themselves are measurable — and what can be measured can be compared to a normative database, which is considerably more reliable than memory.</p>
+
+<details>
+<summary>The 11 Candidate EEG Phenotypes</summary>
+<div class="details-body">
+<table>
+  <tr><th>#</th><th>Phenotype</th><th>Clinical Signature</th></tr>
+  <tr><td>1</td><td>Persistent Alpha (Eyes Open)</td><td>Alpha rhythm fails to attenuate with eyes open; posterior dominant rhythm persists under task load</td></tr>
+  <tr><td>2</td><td>Low Voltage (Fast or Slow)</td><td>Generally low magnitudes across the scalp; may be fast-dominant or slow-dominant variant</td></tr>
+  <tr><td>3</td><td>Spindling Excessive Beta</td><td>Prominent rhythmic beta activity, often medication-related (benzodiazepines, barbiturates) or constitutional</td></tr>
+  <tr><td>4</td><td>Faster Alpha Variants</td><td>Alpha peak frequency shifted above typical 10 Hz; not low voltage</td></tr>
+  <tr><td>5</td><td>Epileptiform</td><td>Spikes, sharp waves, spike-and-wave complexes; requires clinical correlation</td></tr>
+  <tr><td>6</td><td>Excess Temporal Alpha</td><td>Alpha activity prominent at temporal sites beyond normal posterior distribution</td></tr>
+  <tr><td>7</td><td>Frontal Asymmetries</td><td>Lateralized power differences at frontal sites; associated with mood and motivation</td></tr>
+  <tr><td>8</td><td>Frontal Lobe Disturbances</td><td>Excess slow activity or disorganization at frontal sites</td></tr>
+  <tr><td>9</td><td>Mixed Fast and Slow</td><td>Concurrent excess in delta/theta and beta; "busy but inefficient" cortex</td></tr>
+  <tr><td>10</td><td>Focal Abnormalities (Non-Epileptiform)</td><td>Localized slowing or amplitude asymmetry without spike morphology</td></tr>
+  <tr><td>11</td><td>Diffuse Slow Activity</td><td>Generalized excess delta/theta with or without slower alpha peak; metabolic, medication, or degenerative processes</td></tr>
+</table>
+<p>These phenotypes inform the <strong>clinician summary</strong> tabs and the <strong>pattern–condition</strong> analysis engine. The system does not diagnose — it measures, compares to norms, and presents the patterns. The clinician connects the measurement to the patient. Targeting treatment by phenotype rather than symptom checklist has been shown to raise SSRI response rates from roughly 35% to approximately 80%: the EEG tells you what the brain is doing, which turns out to be rather more useful than asking the brain's owner what they think it is doing.</p>
+</div>
+</details>
+
+
+<h3 id="eeg-advanced-viz">Advanced Visualizations (v0.3.1)</h3>
+
+<p>The visualization orchestrator gained four new output families in this release. Each is generated when the requisite data is available; missing prerequisites result in a logged warning rather than a crash, because in clinical and research contexts some analysis is always better than none — build a clinician a partial report and they'll glean insight for a session; crash the pipeline and they'll glean nothing at all.</p>
+
+<details>
+<summary><strong>Coben-Style Granger Brain Overlays</strong></summary>
+<div class="details-body">
+<p>When Granger causality results are available from the NetOps pipeline, the orchestrator generates a family of brain-overlay visualizations in the style used in directed connectivity research:</p>
+<ul>
+  <li><strong>3D brain overlay</strong> — directed arrows between electrode sites, color-coded by Granger F-statistic magnitude, rendered on a translucent cortical surface</li>
+  <li><strong>Slice views</strong> — axial, sagittal, and coronal projections of the connectivity graph</li>
+  <li><strong>Time-resolved Granger</strong> — windowed causality evolution showing how directional influence between regions changes across the recording</li>
+  <li><strong>Spectral Granger matrix</strong> — band-by-band causality heatmap (delta through gamma) for all channel pairs</li>
+</ul>
+<p>These are generated as interactive Plotly HTML and static PNG. The directed nature of Granger — A predicts B is not the same as B predicts A — makes it particularly useful for identifying driver sites and propagation pathways in dysregulated networks.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>LORETA Source Localization</strong></summary>
+<div class="details-body">
+<p>When raw MNE <code>Raw</code> data is available (stored in results as <code>_raw_mne</code> since v0.3.1), the pipeline generates source-localization estimates using sLORETA/eLORETA-style inverse solutions. The visualization shows estimated cortical current density projected onto standardized brain anatomy — answering not just "what frequency is abnormal?" but "where in the cortex is the generator?"</p>
+<p>Source localization from scalp EEG is an <em>ill-posed inverse problem</em> (infinite source configurations can produce the same scalp distribution), but regularized minimum-norm estimates — particularly the standardized variant — provide clinically useful spatial priors. The output is explicitly labeled as an estimate, not a ground truth: the map shows where the math <em>thinks</em> the generators are, which is useful, but not the same as looking directly at the cortex.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Mahalanobis Distance 3D Phenotype</strong></summary>
+<div class="details-body">
+<p>When z-score metrics are available from normative comparison, the system computes the <strong>Mahalanobis distance</strong> — a multivariate measure of how far an individual's feature vector is from the normative centroid, accounting for correlations between features:</p>
+<div class="math">
+  D_M = √( (x − μ)<sup>T</sup> Σ<sup>−1</sup> (x − μ) )
+</div>
+<p>Unlike simple z-scores (which treat each band and channel independently), Mahalanobis distance captures the <em>joint</em> deviation: a patient with moderately elevated theta <em>and</em> moderately reduced alpha may have a perfectly normal z-score on each metric individually, but a very abnormal Mahalanobis distance because the combination is rare. The visualization renders this as a 3D phenotype surface — a topographic landscape where peaks represent regions of maximal statistical distance from the normative population.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Trace Viewer</strong></summary>
+<div class="details-body">
+<p>An interactive, browser-based EDF trace viewer: scrollable multi-channel time-series display with amplitude scaling, channel reordering, and zoom — the digital equivalent of the endless paper roll that EEG technologists have been reading since Berger's first recordings in 1924. Generated as a self-contained HTML file using Plotly, viewable in any browser, embeddable in the job output iframe.</p>
+<p>The trace viewer is generated when raw data is available. It complements the processed topomaps and spectra by letting the clinician see the <em>actual waveforms</em> — because sometimes the most important feature in a recording is a single transient that averages out in the spectral analysis but is obvious to a trained eye scrolling through the trace at 30mm/sec.</p>
+</div>
+</details>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="reflection">The Reflection Engine</h2>
+
+<p>Most AI assistants have the long-term memory of a startled mayfly. Paradox has a reflection engine — a periodic process that reviews recent memories, identifies patterns, and writes a "current focus" document that steers future interactions. Like a clock running counter-clockwise on the wall, it exists to remind the system that what happened yesterday matters to what happens tomorrow — and that the default state of software is to forget everything the moment you restart it.</p>
+
+<h3>How It Works</h3>
+<ol>
+  <li>Two rounds of semantic queries sample diverse content from each memory collection (chat_history, documents, library).</li>
+  <li>The samples are bundled (capped at ~16K chars) and sent to the LLM with a structured prompt asking for: key themes, knowledge gaps, recurring topics, and a concise focus statement.</li>
+  <li>The LLM returns JSON with these fields plus a confidence score.</li>
+  <li>If confidence is above <code>0.35</code>, the focus is written to <code>current_focus.md</code>. If below, the previous focus is preserved — the system doesn't downgrade its own orientation based on a bad reflection pass.</li>
+  <li>The full reflection is saved as a timestamped markdown file and embedded into the documents collection.</li>
+</ol>
+
+<p>The focus document is injected into every subsequent system prompt, giving the model a sense of "what I've been doing lately." Over time, this creates a feedback loop: the model remembers patterns, the reflection engine crystallizes them, and the crystallized focus guides future reasoning.</p>
+
+<blockquote>It is not consciousness. It is not even close. But it is a memory system that knows what it has been thinking about, and that is more than most software can claim. A man is not dead while his name is still spoken; a memory is not lost while its importance score is still above the decay threshold.</blockquote>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="versioning">Version Tracking</h2>
+
+<p>A program that does not know what version it is cannot be trusted to know what version of anything else it is running, either. As of v0.3.1, the version is a single source of truth:</p>
+
+<table>
+  <tr><th>File / Script</th><th>Purpose</th></tr>
+  <tr><td><code>VERSION</code></td><td>Plain-text file at repo root containing <code>0.3.1</code> (or current version). Read by build scripts, Tauri config, and <code>pyproject.toml</code>.</td></tr>
+  <tr><td><code>CHANGELOG.md</code></td><td>Keep-a-Changelog format. Every fix, feature, and documentation change is recorded here — because memory is what separates a project from a collection of files that happen to be in the same directory.</td></tr>
+  <tr><td><code>scripts/bump_version.ps1</code></td><td>Updates <code>VERSION</code>, <code>pyproject.toml</code>, <code>tauri.conf.json</code>, and <code>Cargo.toml</code> in one pass. Takes a version string argument. Refuses to run without one, because assuming a default version is how you ship 0.0.0 to production.</td></tr>
+</table>
+
+<p>The <code>VERSION</code> file is read by <code>build_release.ps1</code> to stamp installer filenames. The Tauri config reads it for the window title and about dialog. The Python package reads it in <code>pyproject.toml</code>. One number, one file, one truth. The rest is derivation.</p>
+
+<blockquote>A name is not dead while it is still spoken. A version is not dead while it is still tracked.</blockquote>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="frontend">Frontend &amp; HUD</h2>
+
+<p>The frontend is a Next.js application with a dark aesthetic that can only be described as "control room chic." Two HUD themes: <strong>cyan</strong> (the default, for when you want to feel like you're piloting a submarine) and <strong>matrix</strong> (green on black, for when you want to feel like you're in a movie about piloting a submarine).</p>
+
+<h3>Components</h3>
+<ul>
+  <li><strong>Chat panel:</strong> Messages render as full Markdown via <code>react-markdown</code> + <code>remark-gfm</code>. Links are clickable (target _blank). Tables, code blocks, lists, and blockquotes all render properly.</li>
+  <li><strong>System sidebar:</strong> Ollama health status (polling every 15 seconds), GPU optimization badges (<code>FA+q8_0</code>), GPU/RAM/CPU stats as JSON, current focus text, and a semantic memory search panel. Includes an "GPU Optimizations" section showing Flash Attention, KV cache type/savings, and embedding quantization mode.</li>
+  <li><strong>License panel:</strong> Toggle from the header badge. Shows active license info (organization, tier, features, expiration) or an activation form (machine ID display, key paste, activate button).</li>
+  <li><strong>File panel:</strong> <code>FilePanel</code> component with drag-and-drop upload zone, category-filtered file list, and delete buttons. Supports EEG, documents, and general files.</li>
+  <li><strong>EEG Data panel:</strong> Upload recordings, start <code>/eeg/process</code> jobs, poll progress, list artifacts, preview interactive HTML (traceroute, clinician summary, etc.) in an iframe, and open the job output folder on disk.</li>
+  <li><strong>Header badges:</strong> Health status, optimization indicator (<code>FA+q8_0</code>), license tier, HUD theme toggle.</li>
+  <li><strong>Theme toggle:</strong> Persisted in localStorage as <code>paradox-hud-color</code>. Sets <code>data-hud</code> attribute on the document root; CSS custom properties handle the rest.</li>
+</ul>
+
+<h3>Tauri Detection</h3>
+<p>The frontend detects <code>window.__TAURI_INTERNALS__</code> to determine if it's running inside the desktop app. When in Tauri mode, the API base URL is hardcoded to <code>http://127.0.0.1:8765</code> and health check failures (2+ consecutive) trigger a redirect to the <code>/setup</code> page.</p>
+
+<h3>API Client</h3>
+<p>The frontend talks to the backend through functions in <code>api.ts</code>: agent, health, stats, focus, memory query, license management, and file operations — all pointing at <code>http://127.0.0.1:8765</code> by default.</p>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="api">REST API</h2>
+
+<table>
+  <tr><th>Method</th><th>Endpoint</th><th>Purpose</th></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/health</code></td><td>Status, Ollama connectivity, optimization info, <strong><code>eeg_subprocess</code></strong> (bundled worker path, <code>bundled_worker</code>, <code>viz_script_found</code>), <strong><code>eeg_norms_addon</code></strong></td></tr>
+  <tr><td><span class="badge badge-orange">POST</span></td><td><code>/agent</code></td><td>Main agent endpoint — send message, receive answer. Returns <strong>504</strong> on Ollama read timeout, <strong>502</strong> when Ollama is unreachable, <strong>503</strong> when no models loaded.</td></tr>
+  <tr><td><span class="badge badge-orange">POST</span></td><td><code>/memory/query</code></td><td>Semantic search across memory collections</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/system/stats</code></td><td>CPU, RAM, disk, GPU metrics</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/focus</code></td><td>Current reflection focus document</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/tools</code></td><td>List registered tools and parameters</td></tr>
+  <tr><td><span class="badge badge-orange">POST</span></td><td><code>/ingest/path</code></td><td>Ingest a file by filesystem path</td></tr>
+  <tr><td><span class="badge badge-orange">POST</span></td><td><code>/files/upload</code></td><td>Upload files (EEG, documents, general)</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/files</code></td><td>List uploaded files (with category filter)</td></tr>
+  <tr><td><span class="badge badge-cyan">DELETE</span></td><td><code>/files/{cat}/{name}</code></td><td>Delete an uploaded file</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/eeg/outputs</code></td><td>List global EEG output files (HTML, images, JSON)</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/eeg/outputs/{filename}</code></td><td>Download one file from global output</td></tr>
+  <tr><td><span class="badge badge-orange">POST</span></td><td><code>/eeg/process</code></td><td>Upload EEG; start background pipeline + viz job</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/eeg/jobs</code></td><td>List processing jobs</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/eeg/jobs/{id}</code></td><td>Job status, messages, output file list</td></tr>
+  <tr><td><span class="badge badge-green">GET</span></td><td><code>/eeg/jobs/{id}/files/{path}</code></td><td>Serve job artifact (iframe-safe HTML)</td></tr>
+  <tr><td><span class="badge badge-orange">POST</span></td><td><code>/eeg/jobs/{id}/delete</code></td><td>Delete job directory</td></tr>
+  <tr><td><span class="badge badge-orange">POST</span></td><td><code>/workspace/open</code></td><td>Open EEG output folder in OS file manager</td></tr>
+</table>
+
+<p>All endpoints return JSON. The <code>/agent</code> response includes: <code>answer</code>, <code>confidence</code> (0-1), <code>steps</code> (array of thought/action/observation records), <code>trace_id</code>, <code>escalated_skye</code> (boolean), and <code>symbolic_hints</code> (if triggered). The <code>/health</code> response includes an <code>optimizations</code> object with flash attention, KV cache type/savings, and embedding quantization status, plus an <code>eeg_subprocess</code> block reporting: resolved <code>python</code> path, <code>frozen</code> flag, <code>bundled_worker</code> (true when <code>paradox-eeg-worker.exe</code> is found), <code>viz_script_found</code>, and any <code>warning</code>/<code>error</code> from the probe.</p>
+
+<p>The <code>GET /eeg/jobs</code> listing now includes <strong><code>condition</code></strong> and <strong><code>output_mode</code></strong> fields per job, so the frontend can display badge labels without polling each job individually. This is the kind of optimisation that saves milliseconds per request — which, laid end to end like nanosecond wires, add up to a user experience that does not make people tap their desks.</p>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="optimization">GPU &amp; Memory Optimization</h2>
+
+<p>Running a competent language model on consumer hardware is a game of inches. Every byte of VRAM matters. Every millisecond of memory bandwidth counts. Paradox applies three layers of optimization — one for how the model <em>thinks</em>, one for how it <em>remembers what it's thinking</em>, and one for how it <em>stores what it's thought about</em>.</p>
+
+<h3>Target Hardware</h3>
+<table>
+  <tr><th>Component</th><th>Spec</th><th>Role</th></tr>
+  <tr><td>RAM</td><td>32 GB</td><td>ChromaDB, Python analysis, general headroom</td></tr>
+  <tr><td>GPU</td><td>RTX 5060 (8 GB VRAM)</td><td>Ollama inference (Qwen3:8B + phi4-mini)</td></tr>
+  <tr><td>Storage</td><td>SSD</td><td>ChromaDB, EEG workspace, model weights</td></tr>
+</table>
+
+
+<!-- ── FLASH ATTENTION ── -->
+<h3 id="opt-flash">Flash Attention</h3>
+
+<p>Standard attention computes the full N&times;N attention matrix, which for a 16K context means 256 million entries — each a float16. Flash attention rewrites this as a series of tiled operations that never materialize the full matrix, keeping everything in fast SRAM instead of slow HBM (GPU global memory).</p>
+
+<div class="layer-card">
+<h4>Configuration</h4>
+<pre><code><span class="cm"># Environment variable (set by Tauri on Ollama launch, or in .env)</span>
+OLLAMA_FLASH_ATTENTION=1
+
+<span class="cm"># Also passed per-request via Ollama API options:</span>
+{"options": {"flash_attn": true}}</code></pre>
+</div>
+
+<p><strong>Effect:</strong> Reduces attention VRAM from O(N&sup2;) to O(N), allowing longer context windows on the same hardware. Also delivers ~2x speedup on attention computation because the memory-bound bottleneck is eliminated.</p>
+
+
+<!-- ── KV CACHE ── -->
+<h3 id="opt-kv">KV Cache Quantization</h3>
+
+<p>During inference, the model stores the key and value tensors for every token in the context. For Qwen3:8B with 16K context, this cache alone consumes approximately <strong>2 GB</strong> of VRAM at float16. KV cache quantization compresses these tensors:</p>
+
+<table>
+  <tr><th>Mode</th><th>Bits per Value</th><th>VRAM Savings</th><th>Quality Impact</th></tr>
+  <tr><td><code>f16</code> (default)</td><td>16</td><td>None (baseline)</td><td>None</td></tr>
+  <tr><td><code>q8_0</code> <span class="badge badge-green">recommended</span></td><td>8</td><td>~50%</td><td>Negligible</td></tr>
+  <tr><td><code>q4_0</code></td><td>4</td><td>~75%</td><td>Small to medium</td></tr>
+</table>
+
+<div class="layer-card">
+<h4>Configuration</h4>
+<pre><code><span class="cm"># Environment variable</span>
+OLLAMA_KV_CACHE_TYPE=q8_0
+
+<span class="cm"># In .env (Paradox config)</span>
+OLLAMA_KV_CACHE_TYPE=q8_0</code></pre>
+</div>
+
+<p>With <code>q8_0</code>, the KV cache for 16K context drops from ~2 GB to ~1 GB. Combined with flash attention, this frees enough VRAM to push the context to 32K or even 64K on an 8 GB GPU — meaning longer conversations and deeper agent reasoning chains without out-of-memory crashes.</p>
+
+
+<!-- ── EMBEDDING QUANTIZATION ── -->
+<h3 id="opt-embed">Embedding Quantization</h3>
+
+<p>Every memory entry in ChromaDB stores a 768-dimensional float32 embedding vector — that's <strong>3,072 bytes per vector</strong>. Over thousands of documents and conversation turns, this adds up. The embedding quantizer in <code>hexnode/embed_quantize.py</code> compresses these vectors before storage.</p>
+
+<h4>The Algorithm</h4>
+<ol>
+  <li><strong>Random rotation:</strong> A deterministic orthogonal matrix R (generated via QR decomposition with seed 42) is applied to the raw embedding. This spreads information uniformly across all dimensions — a data-oblivious step that works on any input without calibration.</li>
+  <li><strong>Scalar quantization:</strong> Each coordinate of the rotated vector is mapped to a discrete set of levels (256 for int8, 16 for int4, 2 for binary).</li>
+  <li><strong>Inverse rotation:</strong> R&sup1; is applied to map back to the original coordinate space. ChromaDB receives a vector that looks like a normal embedding but contains quantized information.</li>
+</ol>
+
+<div class="math">
+  v&#x0302; = R<sup>T</sup> &middot; Q(R &middot; v)
+</div>
+
+<p>Where <em>Q</em> is the scalar quantizer and <em>R</em> is the rotation matrix. The key insight: the rotation makes coordinates approximately independent and identically distributed, so per-coordinate quantization is near-optimal without any data-specific training.</p>
+
+<table>
+  <tr><th>Bit Width</th><th>Levels</th><th>Effective Compression</th><th>Search Quality</th></tr>
+  <tr><td>32 (off)</td><td>Continuous</td><td>1x (baseline)</td><td>Perfect</td></tr>
+  <tr><td>8 <span class="badge badge-green">default</span></td><td>256</td><td>~4x</td><td>Excellent (&gt;99% recall)</td></tr>
+  <tr><td>4</td><td>16</td><td>~8x</td><td>Good (~95% recall)</td></tr>
+  <tr><td>1 (binary)</td><td>2</td><td>~32x</td><td>Acceptable for coarse search</td></tr>
+</table>
+
+<div class="layer-card">
+<h4>Configuration</h4>
+<pre><code><span class="cm"># In .env</span>
+EMBED_QUANTIZE_BITS=8  <span class="cm"># 0=off, 8=int8, 4=int4, 1=binary</span></code></pre>
+</div>
+
+
+<!-- ── TURBOQUANT THEORY ── -->
+<h3 id="opt-turboquant">TurboQuant: The Theory Behind It</h3>
+
+<p>The embedding quantization module is inspired by <strong>TurboQuant</strong> (Google Research, ICLR 2026), a data-oblivious vector quantization algorithm that achieves near-optimal compression.</p>
+
+<details>
+<summary>Data-Oblivious vs. Data-Dependent Quantization</summary>
+<div class="details-body">
+<p>Traditional methods like <strong>Product Quantization (PQ)</strong> require a training step: they run k-means clustering on your data to build a codebook. This takes hundreds of seconds for large datasets, and the codebook is specific to the data distribution — change the data, retrain the codebook.</p>
+<p>TurboQuant eliminates this entirely. A random rotation transforms any input distribution into a predictable form (concentrated Beta distribution on each coordinate). Because the math works regardless of input, it requires <strong>zero preprocessing</strong>. This is why we use it for a live system that ingests documents continuously — there's nothing to retrain.</p>
+</div>
+</details>
+
+<details>
+<summary>Inner Product Bias Correction</summary>
+<div class="details-body">
+<p>In the LLM's attention mechanism, inner products determine which tokens are important. Traditional compression (optimized for Mean Squared Error) systematically shrinks these values — a tiny bias that, multiplied across billions of parameters, causes accuracy degradation.</p>
+<p>TurboQuant's full algorithm uses a two-stage approach: compress the main data, then apply a <strong>Quantized Johnson-Lindenstrauss (QJL)</strong> transform to the residual, creating an unbiased estimator. Our embedding quantizer implements the first stage (rotation + scalar quantize); the residual correction becomes relevant when KV cache quantization advances beyond q8_0.</p>
+</div>
+</details>
+
+<details>
+<summary>Shannon's Lower Bound</summary>
+<div class="details-body">
+<p>Information theory defines a minimum distortion for any given compression rate — the <strong>rate-distortion function</strong>. TurboQuant is provably within <strong>2.7&times;</strong> of this absolute mathematical limit across all bit-widths. For 1-bit compression, it is only 1.45&times; away from perfection.</p>
+<div class="math">
+  D(R) &ge; &sigma;&sup2; &middot; 2<sup>-2R</sup>  (Shannon lower bound for Gaussian source)
+</div>
+<p>Where <em>D</em> is distortion, <em>R</em> is rate in bits per dimension, and <em>&sigma;&sup2;</em> is the source variance. TurboQuant achieves <em>D</em> &le; 2.7 &middot; D<sub>optimal</sub>, which for a data-oblivious method is remarkable.</p>
+</div>
+</details>
+
+<h4>Future: When TurboQuant Lands in Ollama</h4>
+<p>The llama.cpp community has already built TurboQuant implementations. When this lands in Ollama as a new <code>kv_cache_type</code> option, the upgrade path is a single environment variable change — from <code>q8_0</code> to a TurboQuant-based 3-bit mode that achieves <strong>6&times; compression with zero accuracy loss</strong>. The Paradox config layer is already designed for this: change <code>OLLAMA_KV_CACHE_TYPE</code> and restart.</p>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="desktop">Desktop Application</h2>
+
+<p>Not everyone wants to wrangle Python virtual environments and terminal commands. The desktop application wraps the entire Paradox stack into a single installable package that handles everything from downloading Ollama to pulling models to starting the backend — all through a guided first-run wizard.</p>
+
+
+<!-- ── TAURI ── -->
+<h3 id="desktop-tauri">Tauri v2 Shell</h3>
+
+<p>The desktop shell is built with <strong>Tauri v2</strong> (Rust). Unlike Electron, Tauri uses the system's native WebView — no bundled Chromium, no 200 MB of browser engine. The Tauri binary itself is ~5 MB; the bulk of the installer size is the PyInstaller backend bundle.</p>
+
+<table>
+  <tr><th>Component</th><th>Technology</th><th>Size</th></tr>
+  <tr><td>Desktop shell</td><td>Tauri v2 (Rust)</td><td>~5 MB</td></tr>
+  <tr><td>Frontend</td><td>Next.js static export</td><td>~2 MB</td></tr>
+  <tr><td>Backend sidecar (API)</td><td>PyInstaller onedir bundle</td><td>~246 MB</td></tr>
+  <tr><td>EEG worker</td><td>PyInstaller onedir (inside API bundle)</td><td>~300 MB</td></tr>
+  <tr><td>NSIS installer</td><td>Compressed package (total)</td><td>~340 MB</td></tr>
+</table>
+
+<h4>System Tray Integration</h4>
+<p>Closing the window minimizes to the system tray — the backend keeps running. Right-click the tray icon for "Show Window" or "Quit Paradox" (which kills the sidecar process and exits).</p>
+
+
+<!-- ── SIDECAR ── -->
+<h3 id="desktop-sidecar">Sidecar &amp; Worker Architecture</h3>
+
+<p>The Python FastAPI backend is bundled by PyInstaller into a standalone executable directory. Tauri manages it as a child process:</p>
+
+<ol>
+  <li>On startup, Tauri searches multiple candidate paths for <code>paradox-api.exe</code> (resource directory, parent directories — accounting for NSIS/MSI installation layouts).</li>
+  <li>The sidecar is spawned with its working directory set to the bundle directory (critical: PyInstaller's <code>_internal/</code> directory must be discoverable).</li>
+  <li>Tauri polls <code>http://127.0.0.1:8765/health</code> until the backend is healthy (up to 60 seconds).</li>
+  <li>On quit, Tauri sends <code>taskkill /F /PID</code> to terminate the sidecar.</li>
+</ol>
+
+<p>Key PyInstaller configuration: the API spec (<code>paradox-api.spec</code>) uses a comprehensive <code>_EXCLUDES</code> list to keep the API bundle lean — no PyTorch, no Transformers, no scipy, no matplotlib. The heavy science stack ships separately in <strong><code>paradox-eeg-worker.exe</code></strong> (built from <code>paradox-eeg-worker.spec</code>), which lives at <code>eeg-worker/</code> inside the API bundle directory. This separation is deliberate: the API starts in under 3 seconds; the worker loads the full MNE/SciPy/Plotly universe only when an EEG job actually needs it. Go ahead and do it — but do it in the right process.</p>
+
+<div class="layer-card">
+  <h4>The Two-Executable Design</h4>
+  <table>
+    <tr><th>Executable</th><th>Contents</th><th>Approx. Size</th><th>When It Runs</th></tr>
+    <tr><td><code>paradox-api.exe</code></td><td>FastAPI, httpx, ChromaDB, agent loop, tool registry</td><td>~246 MB</td><td>Always (sidecar)</td></tr>
+    <tr><td><code>paradox-eeg-worker.exe</code></td><td>MNE, SciPy, Matplotlib, Plotly, scikit-learn, networkx, statsmodels</td><td>~300 MB</td><td>On demand (subprocess per EEG job)</td></tr>
+  </table>
+  <p>The worker inherits <code>PYTHONPATH</code> pointing at the API's <code>_internal</code> directory so both executables resolve <code>import hexnode</code> to the same source tree. This was the hardest bug in the v0.3.1 cycle — PyInstaller frozen exes ignore <code>PYTHONPATH</code> at startup, so the launcher manually injects the path via <code>sys.path</code> before any hexnode imports. It is easier to ask forgiveness than permission, but it is easier still to inject the path correctly on the first try.</p>
+</div>
+
+
+<h3 id="desktop-build">Build Pipeline (v0.3.1)</h3>
+
+<p>Two scripts build the entire release. If you are thinking "surely there are more scripts than that," you are thinking of the old way. We do not do things the old way. The clock on the wall runs counter-clockwise.</p>
+
+<h4><code>scripts/build_backend.ps1</code></h4>
+<ol>
+  <li>Builds <code>paradox-eeg-worker.exe</code> from <code>paradox-eeg-worker.spec</code> (the heavy science bundle)</li>
+  <li>Builds <code>paradox-api.exe</code> from <code>paradox-api.spec</code> (the lean API bundle)</li>
+  <li>Copies the worker into <code>dist/paradox-api/eeg-worker/</code></li>
+  <li>Validates the full bundle (worker exists, <code>_internal</code> present, key files intact)</li>
+</ol>
+<p>If the old <code>dist/paradox-api</code> directory cannot be removed (PermissionError — something is holding a file handle), the script renames it out of the way and fails loudly if that doesn't work. Silent failures during packaging are the digital equivalent of a loose electrode: you won't know the data is wrong until the report looks absurd.</p>
+
+<h4><code>scripts/build_release.ps1</code></h4>
+<ol>
+  <li>Runs <code>npm run build</code> in <code>web/</code> for the static Next.js export</li>
+  <li>Delegates to <code>build_backend.ps1</code> for both executables</li>
+  <li>Runs <code>cargo tauri build --ci</code> to produce MSI and NSIS installers</li>
+</ol>
+<p>Output lands in <code>src-tauri/target/release/bundle/msi/</code> and <code>bundle/nsis/</code>, with version numbers sourced from the <code>VERSION</code> file.</p>
+
+
+<!-- ── SETUP ── -->
+<h3 id="desktop-setup">First-Run Setup Flow</h3>
+
+<div class="diagram">
+  <div class="box">Check Ollama</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">Download &amp; Install</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box active">Start w/ GPU Opts</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">Pull Models</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">Start Sidecar</div>
+  <div class="arrow">&rarr;</div>
+  <div class="box">Ready</div>
+</div>
+
+<p>The setup page (<code>/setup</code>) orchestrates these Tauri commands:</p>
+<ol>
+  <li><code>check_ollama</code> — Searches standard install paths and PATH for <code>ollama.exe</code>.</li>
+  <li><code>download_ollama</code> — If missing, downloads <code>OllamaSetup.exe</code> from ollama.com and runs it silently.</li>
+  <li><code>ensure_ollama_serving</code> — Spawns <code>ollama serve</code> with <code>OLLAMA_FLASH_ATTENTION=1</code> and <code>OLLAMA_KV_CACHE_TYPE=q8_0</code>. Polls until the API responds.</li>
+  <li><code>pull_model</code> — Downloads <code>qwen3:8b</code> and <code>nomic-embed-text</code> if not already present.</li>
+  <li><code>start_api_sidecar</code> — Launches the PyInstaller backend (which includes <code>eeg-worker/paradox-eeg-worker.exe</code> when built with <code>build_release.ps1</code>) and waits for health. The health probe confirms <code>eeg_subprocess.bundled_worker: true</code>.</li>
+</ol>
+
+<p>If the backend goes offline during normal use (2+ consecutive health check failures), the frontend redirects back to <code>/setup</code> to re-establish the stack.</p>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="licensing">Licensing</h2>
+
+<p><strong>This repository build</strong> does not ship product licensing: there are no <code>/license/*</code> API routes, no activation UI, and the tool registry does not block execution by license tier or feature flags. Tools and EEG workflows are available without a key.</p>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="file-mgmt">File Management</h2>
+
+<p>Research assistants that can't accept files are like librarians who refuse to handle books — technically present, but not doing the job they were hired for. Paradox has a file management system with smart routing, because if it is a good idea, you should go ahead and do it rather than waiting for someone to type a path into a terminal:</p>
+
+<table>
+  <tr><th>File Type</th><th>Extensions</th><th>Destination</th><th>Auto-Action</th></tr>
+  <tr><td>EEG recordings</td><td>.edf, .bdf, .set, .fif, .vhdr, .cnt</td><td><code>eeg_workspace/</code></td><td>Available for MNE analysis pipelines</td></tr>
+  <tr><td>Documents</td><td>.pdf, .txt, .md, .csv, .json, .yaml, .docx</td><td><code>ingest_queue/</code></td><td>Immediately ingested into ChromaDB memory</td></tr>
+  <tr><td>General</td><td>Everything else</td><td><code>vault/uploads/</code></td><td>Stored for manual reference</td></tr>
+</table>
+
+<h3>API Endpoints</h3>
+<ul>
+  <li><code>POST /files/upload</code> — Multipart file upload (max 500 MB). Routes by extension, auto-ingests EEG and document files.</li>
+  <li><code>GET /files?category=all|eeg|document|general</code> — Lists files across managed directories.</li>
+  <li><code>DELETE /files/{category}/{filename}</code> — Removes a file.</li>
+</ul>
+
+<h3>Frontend Integration</h3>
+<p>The sidebar includes a <code>FilePanel</code> component with drag-and-drop upload, progress indicators, and a categorized file list with delete buttons. EEG files uploaded here are immediately available for the <code>run_eeg_pipeline</code> and <code>run_python_analysis</code> tools.</p>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<h2 id="use-cases">Use Cases</h2>
+
+<details>
+<summary><strong>Clinical QEEG Review</strong></summary>
+<div class="details-body">
+<p>"Load the EDF from today's session, run the full pipeline, and tell me which channels show excessive theta."</p>
+<p>The agent calls <code>run_eeg_pipeline</code>, which generates and executes the 24-step script. The pipeline loads the EDF, preprocesses it, runs ICA with ICLabel for artifact removal, computes band power topomaps, and produces a quality report. The agent reads the report and the band power metrics, then answers: "Channels Fz and Cz show elevated theta (4-8 Hz) power at 2.3× and 1.8× the mean, respectively. Here's the topomap: [link to output file]."</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Neurofeedback Protocol Research</strong></summary>
+<div class="details-body">
+<p>"Find recent papers on alpha-theta neurofeedback for PTSD."</p>
+<p>The agent calls <code>deep_research</code>, which queries PubMed, Google Scholar, and general web simultaneously. Results are fetched, cached, and synthesized. The agent returns a Markdown summary with paper titles, key findings, sample sizes, and direct links to the sources.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Custom EEG Analysis Script</strong></summary>
+<div class="details-body">
+<p>"Load patient_003.edf, compute coherence between F3 and F4 in the alpha band, and plot it over time."</p>
+<p>The agent writes a MNE-Python script using <code>run_python_analysis</code> that loads the file, filters to 8-13 Hz, computes spectral connectivity between the specified channel pair, and saves a time-frequency coherence plot. If the script fails (wrong channel name, missing montage), the agent reads the error, fixes the code, and retries automatically.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Event Research</strong></summary>
+<div class="details-body">
+<p>"When and where is the next Suisun Summit?"</p>
+<p>The agent calls <code>web_search</code>. The multi-phase pipeline generates query variants (including concatenated keyword recovery for typos like "sui sun" → "suisun"), searches with staggered execution, probes for current-year URLs, and follows outbound links from discovered pages. Returns the event name, location, dates, and a clickable link to the official page — typically in under 50 seconds.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>Knowledge Building</strong></summary>
+<div class="details-body">
+<p>Drop a PDF of a research paper into <code>data/ingest_queue/</code>. The file watcher detects it within 60 seconds, chunks the text (1200 chars, 150 overlap), embeds each chunk, and stores them in the library collection. In future conversations, the agent can recall specific findings from the paper via <code>query_memory</code>.</p>
+</div>
+</details>
+
+<details>
+<summary><strong>System Monitoring</strong></summary>
+<div class="details-body">
+<p>"How much VRAM is Ollama using right now?"</p>
+<p>Routed via dual-model as AGENT (needs tool). The agent calls <code>get_system_stats</code>, which parses nvidia-smi CSV output. Returns: model name, VRAM used/total, temperature, utilization percentage — all from a single tool call.</p>
+</div>
+</details>
+
+
+<!-- ════════════════════════════════════════════════════════════════════ -->
+<p style="margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--border); color: var(--text-dim); font-size: .85rem;">
+  Paradox Solutions LLM v0.3.1 — A system built on the principle that if you're going to run an AI locally, you might as well build it properly. Now with a <strong>bundled EEG worker</strong> (MNE, SciPy, Plotly, scikit-learn, networkx, statsmodels — no separate Python science install required), <strong>Coben-style Granger brain overlays</strong>, <strong>LORETA source localization</strong>, <strong>Mahalanobis 3D phenotype surfaces</strong>, <strong>interactive Trace Viewer</strong>, proper <strong>504 timeout handling</strong> on the agent route, <strong>version tracking</strong> via a single <code>VERSION</code> file, and a two-script build pipeline that produces MSI/NSIS installers. Plus everything from v0.3.0: native desktop packaging, offline licensing, GPU optimizations, file management, REST EEG jobs with interactive dashboards, and agent tools for full pipelines and custom MNE scripts. Every layer documented. Every formula shown. Every decision explained — because black boxes are for magicians, and this is engineering.
+</p>
+<!-- GNU Terry Pratchett — "A man is not dead while his name is still spoken." -->
+<!-- Grace Hopper — "The most dangerous phrase is: We've always done it this way." -->
+<!-- For the half-million EEGs that taught us what the brain actually does. -->
+
+</main>
+
+<script>
+// Highlight active nav link on scroll
+const sections = document.querySelectorAll('h2[id], h3[id]');
+const navLinks = document.querySelectorAll('nav a[href^="#"]');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -70% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>

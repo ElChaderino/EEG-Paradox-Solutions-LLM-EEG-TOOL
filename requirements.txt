@@ -1,0 +1,17 @@
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+httpx>=0.27.0
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+chromadb>=0.5.0
+psutil>=6.0.0
+trafilatura>=1.6.0
+pypdf>=5.0.0
+python-multipart>=0.0.9
+pyyaml>=6.0.0
+
+# EEG viz + MNE pipeline (dev + paradox-eeg-worker build). Use pyproject [eeg] or:
+#   pip install mne scipy matplotlib plotly pandas scikit-learn Pillow
+# Optional: statsmodels, networkx (only if you restore NetOps tooling)
+# Optional ICA auto-labeling (pipeline step 11): pip install mne-icalabel
+#   (may pull torch); without it, logs "ICLabel unavailable" and uses EOG fallback.
